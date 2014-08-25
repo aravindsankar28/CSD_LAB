@@ -54,6 +54,10 @@ Cache::Cache(int size, int assoc, int blk_size, int hit_latency, int policy){
  *
  */
 
+uint64_t Cache::find_tag(uint64_t address)
+{
+	return address >> (map_bits+offset_bits);
+}
 int Cache::find_block(uint64_t address)
 {
 	// Required ?
@@ -88,17 +92,39 @@ bool Cache::search(int set, uint64_t tag)
 void Cache::read(uint64_t address)
 {
   //TODO Model read access first before coding it
-  hit = false;
-  curr_block = -1;
+  // /hit = false;
+  /*curr_block = -1;
   curr_set = -1;
+  */
+
 }
 
 void Cache::write(uint64_t address)
 {
   //TODO Model write access first before coding it
   hit = false;
-  curr_block = -1;
-  curr_set = -1;
+  // Called when search fails.
+  // Find if there's a place in the corresponding set
+  int set = find_set(address);
+  int i;
+  for (i = 0; i <  assoc; ++i)
+  {
+  	if(! is_valid(set,i) )  
+  		break;
+  }
+  if (i == assoc)
+  {
+  	// No free space - evict 
+  	evict(set);
+  	i = curr_set;
+  }
+ 
+  addrs_stored[set][i] = find_tag(address);
+  	// make valid 
+ 
+/*  curr_block = -1;
+  curr_set = -1;*/
+
 }
 
 void Cache::invalidate(int set, int block)

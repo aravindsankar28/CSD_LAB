@@ -6,8 +6,12 @@
 //#include <cstdint>
 #include <stdint.h>
 
+#ifndef CACHE_H
+#define	CACHE_H
+
+
 class Cache{
-  protected:
+  public:
     int size; // Total size of cache (Units ? In KBs)
     int assoc; // Associativity - no. of blocks in a set.
     int blk_size; // Size of a memory block.
@@ -33,6 +37,8 @@ class Cache{
     int curr_set;
     
     //Functions
+    uint64_t find_tag(uint64_t address);
+   
     /**
      * Find block from the given address
      * 
@@ -92,3 +98,4 @@ class Cache{
      * */
     void write(uint64_t address);
 };
+#endif	
