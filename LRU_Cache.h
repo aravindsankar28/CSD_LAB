@@ -5,6 +5,9 @@
 #include "Cache.h"
 //#include <cstdint>
 #include <stdint.h>
+
+#ifndef LRU_CACHE_H
+#define LRU_CACHE_H
 class LRU_Cache : public Cache{
   //current access
   int curr_access;
@@ -22,4 +25,6 @@ public:
   void write(uint64_t address);
   
 };
-    
+
+#endif
+

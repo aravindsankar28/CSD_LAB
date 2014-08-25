@@ -15,13 +15,13 @@ Cache::Cache(int size, int assoc, int blk_size, int hit_latency, int policy){
   this->blk_size = blk_size;
   this->hit_latency = hit_latency;
   this->policy = policy; 
-   
+  
   //find num_sets
   this->num_sets = (size*1024) / (blk_size*assoc); // Number of sets 
   this->map_bits = ceil(log2(num_sets)); // Number of middle bits (map bits).
   this->set_bits = ceil(log2(assoc)); // Number of bits to index inside each set.
   this->offset_bits = ceil(log2(blk_size)); // Number of bits for offset 
-
+  
   //initialise addrs_stored matrix
   this->addrs_stored = (uint64_t**)malloc(num_sets * sizeof(uint64_t*));
   for(int i = 0; i < num_sets; i++){
@@ -34,12 +34,12 @@ Cache::Cache(int size, int assoc, int blk_size, int hit_latency, int policy){
       this->invalidate(i, j);
     }
   }
-    
+  
   //initialise stats
   this->accesses = 0;
   this->hits = 0;
   this->miss_ratio = 0;
- }
+}
 
 /*           63|62                        s+b|s+b-1             s|s-1          0
  *  ---------------------------------------------------------------------------
@@ -56,19 +56,19 @@ Cache::Cache(int size, int assoc, int blk_size, int hit_latency, int policy){
 
 uint64_t Cache::find_tag(uint64_t address)
 {
-	return address >> (map_bits+offset_bits);
+  return address >> (map_bits+offset_bits);
 }
 int Cache::find_block(uint64_t address)
 {
-	// Required ?
+  // Required ?
   int tmp = address << (64-map_bits-set_bits);
   return tmp >> set_bits;
-
+  
 }
 
 int Cache::find_set(uint64_t address)
 {
-	// Basically return the map bits portion.
+  // Basically return the map bits portion.
   return (address >> offset_bits) % (1<<map_bits);
   //return address << (64-map_bits);
 }	
@@ -94,37 +94,41 @@ void Cache::read(uint64_t address)
   //TODO Model read access first before coding it
   // /hit = false;
   /*curr_block = -1;
-  curr_set = -1;
-  */
-
+   *  curr_set = -1;
+   */
+  
 }
 
+// Implementation wise, this is called ONLY when search fails.
 void Cache::write(uint64_t address)
 {
   //TODO Model write access first before coding it
   hit = false;
-  // Called when search fails.
-  // Find if there's a place in the corresponding set
+  
   int set = find_set(address);
   int i;
   for (i = 0; i <  assoc; ++i)
   {
-  	if(! is_valid(set,i) )  
-  		break;
+    if(! is_valid(set,i))
+    {
+      hit = true;
+      break;
+    }
   }
-  if (i == assoc)
+  if (!hit)
   {
-  	// No free space - evict 
-  	evict(set);
-  	i = curr_set;
+    // No free space - evict 
+    evict(set);
+    i = curr_set;
   }
- 
+  
+  //Store tag in the matrix.
+  //Note : Doing this will automatically validate the block as 
+  //	   all user-space addresses are 48 bits long
+  
   addrs_stored[set][i] = find_tag(address);
-  	// make valid 
- 
-/*  curr_block = -1;
-  curr_set = -1;*/
-
+  
+  return;
 }
 
 void Cache::invalidate(int set, int block)
@@ -146,7 +150,7 @@ bool Cache::is_valid(int set, int block)
 }
 void Cache::evict(int set)
 {
-
+  return;
 }
 
-  
+

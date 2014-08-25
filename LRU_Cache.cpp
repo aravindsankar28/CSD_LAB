@@ -33,15 +33,10 @@ void LRU_Cache::evict(int set)
     }
   }
   
-<<<<<<< HEAD
-  curr_set = set;
-  curr_block = victim;
-=======
-  invalidate(block, victim);
+  invalidate(set, victim);
   
-  curr_block = block;
-  curr_set = victim;
->>>>>>> ce142f6eb29b3eac9718cf8bca27f89a0f9f4afd
+  curr_block = victim;
+  curr_set = set;
   
   return;
 }

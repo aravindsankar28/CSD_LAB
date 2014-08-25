@@ -2,6 +2,9 @@
  * Class to model LFU_Cache
  */
 
+#ifndef LFU_CACHE_H
+#define LFU_CACHE_H
+
 #include "Cache.h"
 #include <cstdint>
 
@@ -18,3 +21,5 @@ public:
   void write(uint64_t address);
   
 };
+
+#endif

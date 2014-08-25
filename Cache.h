@@ -31,12 +31,19 @@ class Cache{
     int hits;
     int miss_ratio;
     
-    //Current Task status : hit/miss and block, set queried
+    //Current Task status : hit/miss and set, block queried
     bool hit;
-    int curr_block;
     int curr_set;
+    int curr_block;
     
     //Functions
+    
+    /**
+     * Find tag from the given address
+     * 
+     * @param address : Address to be accessed
+     * @return : Tag corresponding to the address
+     */
     uint64_t find_tag(uint64_t address);
    
     /**
