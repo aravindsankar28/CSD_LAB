@@ -9,6 +9,6 @@ out/LRU_Cache.o: LRU_Cache.h LRU_Cache.cpp
 out/LFU_Cache.o: LFU_Cache.h LFU_Cache.cpp
 	g++ -c LFU_Cache.cpp -o out/LFU_Cache.o -fPIC
 out/Combined.o: combine.cpp
-	g++ -c combine.cpp -o out/combine.o -fPIC
+	g++ -c combine.cpp -o out/Combined.o -fPIC
 
 	
