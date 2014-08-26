@@ -4,8 +4,8 @@
 LRU_Cache::LRU_Cache(int size, int assoc, int blk_size, int hit_latency): Cache(size, assoc, blk_size, hit_latency, hit_latency)
 {
   //set curr_access to 0
-  curr_access = 0;
-  
+
+  curr_access = 0; 
   //initialise last_use_matrix
   this->last_use_matrix = (int**)malloc(num_sets * sizeof(int*));
   for(int i = 0; i < num_sets; i++){

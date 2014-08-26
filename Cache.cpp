@@ -9,6 +9,7 @@
 #include <cmath>
 #include "Cache.h"
 
+using namespace std;
 Cache::Cache(int size, int assoc, int blk_size, int hit_latency, int policy){
   this->size = size;
   this->assoc = assoc;
@@ -37,7 +38,7 @@ Cache::Cache(int size, int assoc, int blk_size, int hit_latency, int policy){
   
   //initialise stats
   this->accesses = 0;
-  this->hits = 0;
+  //this->hits = 0;
   this->miss_ratio = 0;
 }
 
@@ -56,6 +57,7 @@ Cache::Cache(int size, int assoc, int blk_size, int hit_latency, int policy){
 
 uint64_t Cache::find_tag(uint64_t address)
 {
+
   return address >> (map_bits+offset_bits);
 }
 int Cache::find_block(uint64_t address)
@@ -66,25 +68,36 @@ int Cache::find_block(uint64_t address)
   
 }
 
-int Cache::find_set(uint64_t address)
+uint64_t Cache::find_set(uint64_t address)
 {
   // Basically return the map bits portion.
   return (address >> offset_bits) % (1<<map_bits);
 }	
-
+int count1 = 0;
 bool Cache::search(int set, uint64_t tag)
 {
   accesses++;
+  
   for(int i = 0; i < assoc; i++){
-    if(this->addrs_stored[set][i] == tag){
+
+    if(this->addrs_stored[set][i] == tag) {
       hit = true;
-	  hits++;
+      
+      
       curr_set = set;
-      curr_block = i;
-	  
+
+      curr_block = i;	  
+      hits += 1;
       return true;
     }
   }
+  
+  if(accesses < 3)
+    { 
+      cout << addrs_stored[set][0] <<endl;
+      cout << tag <<" "<< set <<" "<<hit<<endl;
+    }
+
   hit = false;
   
   //Note: curr_block and curr_set will be set by evict() in derived class
@@ -105,30 +118,32 @@ void Cache::read(uint64_t address)
 void Cache::write(uint64_t address)
 {
   //TODO Model write access first before coding it
-  hit = false;
+  bool hit1 = false;
   
   int set = find_set(address);
   int i;
   for (i = 0; i <  assoc; ++i)
   {
-    if(! is_valid(set,i))
+    if( ! is_valid(set,i))
     {
-      hit = true;
+      hit1 = true;
       break;
     }
   }
-  if (!hit)
+
+  if (!hit1)
   {
     // No free space - evict 
     evict(set);
-    i = curr_set;
+    i = curr_block;
   }
   
   //Store tag in the matrix.
   //Note : Doing this will automatically validate the block as 
   //	   all user-space addresses are 48 bits long
-  
-  addrs_stored[set][i] = find_tag(address);
+  uint64_t mask = 1<<63;
+  this->addrs_stored[set][i] &= mask;
+  this->addrs_stored[set][i] = find_tag(address);
   
   return;
 }

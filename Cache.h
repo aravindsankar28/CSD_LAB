@@ -59,7 +59,7 @@ class Cache{
      * @param address : Address to be accessed
      * @return : Set corresponding to the address
      */
-    int find_set(uint64_t address);
+    uint64_t find_set(uint64_t address);
     
     /**
      * Search for a given tag (linear searching)
@@ -67,7 +67,7 @@ class Cache{
      * @param tag   : tag to search for
      * @return	: true if found, false if not found
      */
-    bool search(int block, uint64_t tag);
+    bool search(int set, uint64_t tag);
     
     /**
      * Evict a block from the given find_set
