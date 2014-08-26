@@ -14,7 +14,7 @@ void handle_access(Cache** caches, int n, uint64_t address)
 
     if(caches[i]->search(set,tag) == true)
     {
-    hit = true;
+      hit = true;
     break;
     }
   }

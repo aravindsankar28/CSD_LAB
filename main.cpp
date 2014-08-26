@@ -6,10 +6,11 @@
 #include "Cache.h"
 using namespace std;
 
+#define CONFIG "/home/ganesh/projects/CacheSimulator/config.txt"
 int main(int argc, char **argv) {
 	//std::cout << "Hello, world!" << std::endl;
 
-	std::ifstream input("/home/aravind/CacheSimulator/config.txt");
+	std::ifstream input(CONFIG);
 	std::string line;
 	int levels;
 	int i = 0;

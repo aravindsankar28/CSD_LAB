@@ -5,7 +5,7 @@ Size = 16KB
 Associativity = 1
 Block_size = 32bytes
 Hit_Latency = 4
-Replacement_Policy = LRU
+Replacement_Policy = LFU
 
 [Main Memory]
 Hit Latency = 200
