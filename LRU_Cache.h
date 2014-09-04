@@ -17,11 +17,12 @@ class LRU_Cache : public Cache{
   int **last_use_matrix;
   
   //Overriding base class method
-  void evict(int block);
+  
   
 public:
+  void evict(int set);
   LRU_Cache(int size, int assoc, int blk_size, int hit_latency);
-  void read(uint64_t address);
+  bool read(uint64_t address);
   void write(uint64_t address);
   
 };

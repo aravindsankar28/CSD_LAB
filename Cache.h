@@ -70,6 +70,20 @@ class Cache{
      */
     bool search(int set, uint64_t tag);
     
+
+    /**
+     * Read access to an address.
+     * @param address : Address to be read
+     */
+    virtual bool read(uint64_t address);
+    
+    /**
+     * Write access to address.
+     * @param address : Address to be written
+     * */
+    virtual void write(uint64_t address);
+
+
     /**
      * Evict a block from the given find_set
      * @param block : Block to evict from
@@ -107,19 +121,9 @@ class Cache{
     
     bool is_dirty(int set, int block);
     
-  public:
     Cache(int size, int assoc, int blk_size, int hit_latency, int policy);
     
-    /**
-     * Read access to an address.
-     * @param address : Address to be read
-     */
-    void read(uint64_t address);
-    
-    /**
-     * Write access to address.
-     * @param address : Address to be written
-     * */
-    void write(uint64_t address);
+
+    void searchAndEvict(int set,uint64_t tag);
 };
 #endif	
