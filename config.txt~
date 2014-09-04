@@ -1,0 +1,11 @@
+Levels = 1
+
+[Level 1]
+Size = 16KB
+Associativity = 1
+Block_size = 32bytes
+Hit_Latency = 4
+Replacement_Policy = LRU
+
+[Main Memory]
+Hit Latency = 200

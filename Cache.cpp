@@ -82,21 +82,19 @@ bool Cache::search(int set, uint64_t tag)
 
     if(this->addrs_stored[set][i] == tag) {
       hit = true;
-      
-      
+          
       curr_set = set;
-
       curr_block = i;	  
       hits += 1;
       return true;
     }
   }
   
-  if(accesses < 3)
+/*  if(accesses < 3)
     { 
       cout << addrs_stored[set][0] <<endl;
       cout << tag <<" "<< set <<" "<<hit<<endl;
-    }
+    }*/
 
   hit = false;
   
