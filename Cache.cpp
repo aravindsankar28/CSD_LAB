@@ -140,6 +140,25 @@ bool Cache::is_valid(int set, int block)
   else
     return false;
 }
+
+void Cache::make_dirty(int set, int block)
+{
+  uint64_t mask = 1;
+  mask = mask << 1;
+  this->addrs_stored[set][block] |= mask;
+  return;
+}
+
+bool Cache::is_dirty(int set, int block)
+{
+  uint64_t stored_value = addrs_stored[set][block];
+  int valid_bit = (stored_value >> 1) % 2;
+  if(valid_bit == 0)
+    return true;
+  else
+    return false;
+}
+
 void Cache::evict(int set)
 {
   return;

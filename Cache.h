@@ -76,7 +76,7 @@ class Cache{
     virtual void evict(int set);
     
     /**
-     * Check if given line is isInvalid
+     * Check if given line is valid
      * @param block : Block to check
      * @param set   : Set to check
      * @return : true if valid, false if not
@@ -89,6 +89,22 @@ class Cache{
      * @param block   : Block to invalidate 
      */
     void invalidate(int set, int block);
+    
+    /**
+     * Mark the given block as dirty
+     * @param set : Set in which block is present.
+     * @param block   : Block to invalidate 
+     */
+    void make_dirty(int set, int block);
+    
+    /**
+     * Check if given line is dirty
+     * @param block : Block to check
+     * @param set   : Set to check
+     * @return : true if valid, false if not
+     */
+    
+    bool is_dirty(int set, int block);
     
   public:
     Cache(int size, int assoc, int blk_size, int hit_latency, int policy);
