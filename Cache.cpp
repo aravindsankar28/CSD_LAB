@@ -9,7 +9,7 @@
 #include <cmath>
 #include "Cache.h"
 
-Cache::Cache(int size, int assoc, int blk_size, int hit_latency, int policy, Cache* upper_level, Cache* lower_level){
+Cache::Cache(int size, int assoc, int blk_size, int hit_latency, int policy){
   this->size = size;
   this->assoc = assoc;
   this->blk_size = blk_size;
@@ -21,9 +21,6 @@ Cache::Cache(int size, int assoc, int blk_size, int hit_latency, int policy, Cac
   this->map_bits = ceil(log2(num_sets)); // Number of middle bits (map bits).
   this->set_bits = ceil(log2(assoc)); // Number of bits to index inside each set.
   this->offset_bits = ceil(log2(blk_size)); // Number of bits for offset 
-  
-  this->upper_level = upper_level;
-  this->lower_level = lower_level;
   
   //initialise addrs_stored matrix
   this->addrs_stored = (uint64_t**)malloc(num_sets * sizeof(uint64_t*));

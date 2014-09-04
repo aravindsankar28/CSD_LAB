@@ -108,7 +108,7 @@ class Cache{
     bool is_dirty(int set, int block);
     
   public:
-    Cache(int size, int assoc, int blk_size, int hit_latency, int policy, Cache* upper, Cache* lower);
+    Cache(int size, int assoc, int blk_size, int hit_latency, int policy);
     
     /**
      * Read access to an address.
