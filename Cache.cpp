@@ -117,7 +117,7 @@ void Cache::write(uint64_t address)
   //Note : Doing this will automatically validate the block as 
   //	   all user-space addresses are 48 bits long
   
-  addrs_stored[set][i] = find_tag(address);
+  addrs_stored[set][i] = find_tag(address)<<2;
   
   return;
 }
@@ -125,7 +125,9 @@ void Cache::write(uint64_t address)
 void Cache::invalidate(int set, int block)
 {
   uint64_t mask = 1;
-  this->addrs_stored[set][block] |= mask; // sets it 1 - so as to invalidate
+  
+  //set valid bit i.e 0th bit to 1 by ORing with mask
+  this->addrs_stored[set][block] |= mask; 
   return;
 }
 

@@ -6,7 +6,8 @@
 #define LFU_CACHE_H
 
 #include "Cache.h"
-#include <cstdint>
+//#include <cstdint>
+ #include <stdint.h>
 
 class LFU_Cache : public Cache{
   

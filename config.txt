@@ -12,7 +12,11 @@ Size = 64KB
 Associativity = 8
 Block_size = 32bytes
 Hit_Latency = 16
+<<<<<<< HEAD
 Replacement_Policy = LFU
+=======
+Replacement_Policy = RR
+>>>>>>> 73d61ea9ba34e75188f7e6ce031eec4956e1c539
 
 [Main Memory]
 Hit Latency = 200
