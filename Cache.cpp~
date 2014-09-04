@@ -81,12 +81,10 @@ bool Cache::search(int set, uint64_t tag)
 	  hits++;
       curr_set = set;
       curr_block = i;
-	  
       return true;
     }
   }
   hit = false;
-  
   //Note: curr_block and curr_set will be set by evict() in derived class
   return false;
 }
@@ -105,23 +103,22 @@ void Cache::read(uint64_t address)
 void Cache::write(uint64_t address)
 {
   //TODO Model write access first before coding it
-  hit = false;
-  
   int set = find_set(address);
   int i;
+  bool hit1 = false;
   for (i = 0; i <  assoc; ++i)
   {
     if(! is_valid(set,i))
     {
-      hit = true;
+      hit1 = false;
       break;
     }
   }
-  if (!hit)
+  if (!hit1)
   {
     // No free space - evict 
     evict(set);
-    i = curr_set;
+    i = curr_block;
   }
   
   //Store tag in the matrix.

@@ -46,13 +46,13 @@ class Cache{
      */
     uint64_t find_tag(uint64_t address);
    
-    /**
-     * Find block from the given address
-     * 
-     * @param address : Address to be accessed
-     * @return : Block corresponding to the address
-     */
-    int find_block(uint64_t address);
+//     /**
+//      * Find block from the given address
+//      * 
+//      * @param address : Address to be accessed
+//      * @return : Block corresponding to the address
+//      */
+//     int find_block(uint64_t address);
     
     /**
      * Find set from the given address

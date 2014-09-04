@@ -41,30 +41,32 @@ Cache::Cache(int size, int assoc, int blk_size, int hit_latency, int policy){
   this->miss_ratio = 0;
 }
 
-/*           63|62                        s+b|s+b-1             s|s-1          0
- *  ---------------------------------------------------------------------------
- * | Valid bit | Tag                         |Map                | Offset      |
- * |  1 bit    | (64 - b - s) bits           |'b' bits           | 's' bits    |
- *  ---------------------------------------------------------------------------
- * <----------------------------- (64-s) bits --------------------------------->
+/*                           s+b+2|s+b+1           s+2|s+1         2|     1      |      0
+ *  ---------------------------------------------------------------------------------------------
+ * |       Tag                    |   Map             |  Offset     |    Dirty   |     Valid     |
+ * |  (64 - b - s) bits           |'b' bits           | 's' bits    |     Bit    |      Bit      |
+ *  ---------------------------------------------------------------------------------------------
+ * <--------------------------------------- (64-s) bits ----------------------------------------->
  * 
  * b --> map_bits
  * s --> offset_bits
  * Valid bit --> 0 if present, 1 if not
+ * DirtyBit
  *
  */
 
 uint64_t Cache::find_tag(uint64_t address)
 {
-  return address >> (map_bits+offset_bits);
+  return address >> (map_bits+offset_bits+2);
 }
-int Cache::find_block(uint64_t address)
-{
-  // Required ?
-  int tmp = address << (64-map_bits-set_bits);
-  return tmp >> set_bits;
-  
-}
+
+// int Cache::find_block(uint64_t address)
+// {
+//   // Required ?
+//   int tmp = address << (64-map_bits-set_bits);
+//   return tmp >> set_bits;
+//   
+// }
 
 int Cache::find_set(uint64_t address)
 {
@@ -81,47 +83,34 @@ bool Cache::search(int set, uint64_t tag)
 	  hits++;
       curr_set = set;
       curr_block = i;
-	  
       return true;
     }
   }
   hit = false;
-  
   //Note: curr_block and curr_set will be set by evict() in derived class
   return false;
-}
-
-void Cache::read(uint64_t address)
-{
-  //TODO Model read access first before coding it
-  // /hit = false;
-  /*curr_block = -1;
-   *  curr_set = -1;
-   */
-  
 }
 
 // Implementation wise, this is called ONLY when search fails.
 void Cache::write(uint64_t address)
 {
   //TODO Model write access first before coding it
-  hit = false;
-  
   int set = find_set(address);
   int i;
+  bool hit1 = false;
   for (i = 0; i <  assoc; ++i)
   {
-    if(! is_valid(set,i))
+    if(!is_valid(set,i))
     {
-      hit = true;
+      hit1 = true;
       break;
     }
   }
-  if (!hit)
+  if (!hit1)
   {
     // No free space - evict 
     evict(set);
-    i = curr_set;
+    i = curr_block;
   }
   
   //Store tag in the matrix.
@@ -136,7 +125,6 @@ void Cache::write(uint64_t address)
 void Cache::invalidate(int set, int block)
 {
   uint64_t mask = 1;
-  mask = mask << 63;
   this->addrs_stored[set][block] |= mask; // sets it 1 - so as to invalidate
   return;
 }
@@ -144,7 +132,7 @@ void Cache::invalidate(int set, int block)
 bool Cache::is_valid(int set, int block)
 {
   uint64_t stored_value = addrs_stored[set][block];
-  int valid_bit = stored_value >> 63;
+  int valid_bit = stored_value % 2;
   if(valid_bit == 0)
     return true;
   else
