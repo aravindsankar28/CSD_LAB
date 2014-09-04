@@ -9,7 +9,7 @@
 #include <cmath>
 #include "Cache.h"
 
-Cache::Cache(int size, int assoc, int blk_size, int hit_latency, int policy){
+Cache::Cache(int size, int assoc, int blk_size, int hit_latency, int policy, Cache* upper_level, Cache* lower_level){
   this->size = size;
   this->assoc = assoc;
   this->blk_size = blk_size;
@@ -21,6 +21,9 @@ Cache::Cache(int size, int assoc, int blk_size, int hit_latency, int policy){
   this->map_bits = ceil(log2(num_sets)); // Number of middle bits (map bits).
   this->set_bits = ceil(log2(assoc)); // Number of bits to index inside each set.
   this->offset_bits = ceil(log2(blk_size)); // Number of bits for offset 
+  
+  this->upper_level = upper_level;
+  this->lower_level = lower_level;
   
   //initialise addrs_stored matrix
   this->addrs_stored = (uint64_t**)malloc(num_sets * sizeof(uint64_t*));
@@ -57,7 +60,7 @@ Cache::Cache(int size, int assoc, int blk_size, int hit_latency, int policy){
 
 uint64_t Cache::find_tag(uint64_t address)
 {
-  return address >> (map_bits+offset_bits+2);
+  return address >> (map_bits+offset_bits);
 }
 
 // int Cache::find_block(uint64_t address)
@@ -68,7 +71,7 @@ uint64_t Cache::find_tag(uint64_t address)
 //   
 // }
 
-int Cache::find_set(uint64_t address)
+uint64_t Cache::find_set(uint64_t address)
 {
   // Basically return the map bits portion.
   return (address >> offset_bits) % (1<<map_bits);
@@ -78,7 +81,7 @@ bool Cache::search(int set, uint64_t tag)
 {
   accesses++;
   for(int i = 0; i < assoc; i++){
-    if(this->addrs_stored[set][i] == tag){
+    if((this->addrs_stored[set][i])>>2 == tag){
       hit = true;
 	  hits++;
       curr_set = set;

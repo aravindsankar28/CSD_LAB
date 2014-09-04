@@ -36,8 +36,9 @@ class Cache{
     int curr_set;
     int curr_block;
     
-    //Functions
-    
+    //Details about memory hierarchy
+    Cache* upper_level;
+    Cache* lower_level;
     /**
      * Find tag from the given address
      * 
@@ -107,7 +108,7 @@ class Cache{
     bool is_dirty(int set, int block);
     
   public:
-    Cache(int size, int assoc, int blk_size, int hit_latency, int policy);
+    Cache(int size, int assoc, int blk_size, int hit_latency, int policy, Cache* upper, Cache* lower);
     
     /**
      * Read access to an address.
