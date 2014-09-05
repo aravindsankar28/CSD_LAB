@@ -52,28 +52,38 @@ void handle_write(Cache** caches, int n, uint64_t address)
 
     if(caches[i]->read(address)) // has to be read, we need to call the function that is overridden.
     {
-
+      //WRITE HIT here.
       hit = true;
       break;
     }
   }
  
   count ++;
+  
+  //WRITE HIT : Load block into all levels above i.
   if(hit)
   {
     
     for (int j = 0; j < i; ++j) // misses at all these levels 
     {
-      caches[j]->write(address);
+      caches[j]->load(address);
     }
   }
   else
   {
-    // miss at all caches
+    // WRITE MISS everywhere.
     for (i = 0; i < n; ++i)
     {
-      caches[i]->write(address);
+      caches[i]->load(address);
     }
   }
+  
+  //Make L1 dirty coz only that has most recent value.
+  int dirty_set = caches[0]->find_set(address);
+  int dirty_tag = caches[0]->find_tag(address);
+  caches[0]->search(dirty_set, dirty_tag);
+  int dirty_block = caches[0]->curr_block;
+  
+  caches[0]->make_dirty(dirty_set, dirty_block);
 }
 

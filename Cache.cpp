@@ -74,49 +74,54 @@ uint64_t Cache::find_set(uint64_t address)
   return (address >> offset_bits) % (1<<map_bits);
 }	
 
+/**
+ * If search succeeds, curr_block and curr_set is set to the value of the block.
+ * hit is set to reflect success/failure of this search.
+ */
 bool Cache::search(int set, uint64_t tag)
 {
-  //accesses++;
   for(int i = 0; i < assoc; i++){
     if((this->addrs_stored[set][i])>>2 == tag){
-    //hit = true;
-	  //hits++;
+      hit = true;
       curr_set = set;
       curr_block = i;
       return true;
     }
   }
+
+  //search has failed. Note that curr_block, curr_set will be unaffected if search fails
   hit = false;
-  //Note: curr_block and curr_set will be set by evict() in derived class
   return false;
 }
 
 // Implementation wise, this is called ONLY when search fails.
-void Cache::write(uint64_t address)
+void Cache::load(uint64_t address)
 {
-  //TODO Model write access first before coding it
+  
   int set = find_set(address);
-  int i;
+  int i = 0;
   bool hit1 = false;
   for (i = 0; i <  assoc; ++i)
   {
     if(!is_valid(set,i))
     {
+      //Empty block found. Set hit1 to reflect this.
       hit1 = true;
       break;
     }
   }
+  
   if (!hit1)
   {
-    // No free space - evict 
+    //Free space was not found. Evict a block.
+    //Note: evict() only 'invalidates' the block and sets curr_set, curr_block to the 
+    //location of the evicted block. If block is dirty, corresponding block(s) in lower level 
+    //are made dirty.
     evict(set);
     i = curr_block;
   }
-  
+
   //Store tag in the matrix.
-  //Note : Doing this will automatically validate the block as 
-  //	   all user-space addresses are 48 bits long
-  
   addrs_stored[set][i] = find_tag(address)<<2;
   
   return;
@@ -161,34 +166,46 @@ bool Cache::is_dirty(int set, int block)
 
 void Cache::evict(int set)
 {
-    // To evict cur_set and cur_block 
+  // To evict cur_set and cur_block 
   uint64_t address1 = (((addrs_stored[curr_set][curr_block] >>2) << map_bits) + set) <<offset_bits ;
   uint64_t address2 = address1 + (1 << offset_bits);
-/*  cout << map_bits <<endl;
-
-  cout << "("<< size <<"," << (addrs_stored[curr_set][curr_block] >>2)<<","<<set<<")"<<endl;
- */ 
-  //cout << address1 <<endl;
-  //cout << address2 <<endl;
-  
   uint64_t i = address1;
   while(i <= address2 && upper_level != NULL)
   {
     if(upper_level->search(upper_level->find_set(i),upper_level->find_tag(i)))
     {
-      // block present in upper level
       upper_level->searchAndEvict(upper_level->find_set(i),upper_level->find_tag(i));
     }
-
     i += upper_level->blk_size;
   }
+  
+  //if block to be evicted is dirty, make it dirty at lower level
+  if(is_dirty(set, curr_block))
+  {
+    i = address1;
+    while(i <= address2)
+    {
+      uint64_t lower_set = lower_level->find_set(i);
+      
+      lower_level->search(lower_set, lower_level->find_tag(i));
+      int lower_blk = lower_level->curr_block;
+      
+      lower_level->make_dirty(lower_set, lower_blk);
+      
+      i += lower_level->blk_size;
+    }
+  
+  }
+  
   return;
 }
+
 bool Cache::read(uint64_t address)
 {
     accesses ++;
     bool result = search(find_set(address),find_tag(address));
-    if(result) hits++;
+    if(result)
+      hits++;
     return result;
 }
 

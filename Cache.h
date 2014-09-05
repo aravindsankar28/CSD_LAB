@@ -77,6 +77,7 @@ class Cache{
      */
     virtual bool read(uint64_t address);
     
+    void load(uint64_t address);
     /**
      * Write access to address.
      * @param address : Address to be written
@@ -117,13 +118,12 @@ class Cache{
      * @param block : Block to check
      * @param set   : Set to check
      * @return : true if valid, false if not
-     */
-    
+     */    
     bool is_dirty(int set, int block);
     
-    Cache(int size, int assoc, int blk_size, int hit_latency, int policy);
     
-
+//    Cache(int size, int assoc, int blk_size, int hit_latency, int policy);
+    
     void searchAndEvict(int set,uint64_t tag);
 };
 #endif	
