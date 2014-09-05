@@ -8,7 +8,7 @@
 #include <stdint.h>
 #include <cmath>
 #include "Cache.h"
-
+using namespace std;
 Cache::Cache(int size, int assoc, int blk_size, int hit_latency, int policy){
   this->size = size;
   this->assoc = assoc;
@@ -76,11 +76,11 @@ uint64_t Cache::find_set(uint64_t address)
 
 bool Cache::search(int set, uint64_t tag)
 {
-  accesses++;
+  //accesses++;
   for(int i = 0; i < assoc; i++){
     if((this->addrs_stored[set][i])>>2 == tag){
-      hit = true;
-	  hits++;
+    //hit = true;
+	  //hits++;
       curr_set = set;
       curr_block = i;
       return true;
@@ -161,7 +161,54 @@ bool Cache::is_dirty(int set, int block)
 
 void Cache::evict(int set)
 {
+    // To evict cur_set and cur_block 
+  uint64_t address1 = (((addrs_stored[curr_set][curr_block] >>2) << map_bits) + set) <<offset_bits ;
+  uint64_t address2 = address1 + (1 << offset_bits);
+/*  cout << map_bits <<endl;
+
+  cout << "("<< size <<"," << (addrs_stored[curr_set][curr_block] >>2)<<","<<set<<")"<<endl;
+ */ 
+  //cout << address1 <<endl;
+  //cout << address2 <<endl;
+  
+  uint64_t i = address1;
+  while(i <= address2 && upper_level != NULL)
+  {
+    if(upper_level->search(upper_level->find_set(i),upper_level->find_tag(i)))
+    {
+      // block present in upper level
+      upper_level->searchAndEvict(upper_level->find_set(i),upper_level->find_tag(i));
+    }
+
+    i += upper_level->blk_size;
+  }
   return;
 }
+bool Cache::read(uint64_t address)
+{
+    accesses ++;
+    bool result = search(find_set(address),find_tag(address));
+    if(result) hits++;
+    return result;
+}
+
+void Cache::searchAndEvict(int set, uint64_t tag)
+{
+  uint64_t address1 = ((tag << map_bits) + set) << offset_bits ;
+  uint64_t address2 = address1 + (1 << offset_bits);
+  uint64_t i = address1;
+  
+  while(i <= address2 && upper_level != NULL)
+  {
+    if(upper_level->search(upper_level->find_set(i),upper_level->find_tag(i)))
+    {
+      // block present in upper level
+      upper_level->evict(upper_level->find_set(i));
+    }
+    i += upper_level->blk_size;
+  }
+
+}
+
 
 

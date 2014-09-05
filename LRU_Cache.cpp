@@ -1,5 +1,8 @@
 #include "LRU_Cache.h"
 #include <cstdlib>
+#include <iostream>
+
+using namespace std;
 
 LRU_Cache::LRU_Cache(int size, int assoc, int blk_size, int hit_latency): Cache(size, assoc, blk_size, hit_latency, hit_latency)
 {
@@ -23,6 +26,7 @@ LRU_Cache::LRU_Cache(int size, int assoc, int blk_size, int hit_latency): Cache(
 
 void LRU_Cache::evict(int set)
 {
+
   //Evict using LRU policy
   //TODO: Update curr_block, curr_set to the victimized block, set
   int victim = 0;
@@ -37,18 +41,20 @@ void LRU_Cache::evict(int set)
   
   curr_block = victim;
   curr_set = set;
-  
+  Cache::evict(set);
   return;
 }
 
-void LRU_Cache::read(uint64_t address)
+bool LRU_Cache::read(uint64_t address)
 {
+
   curr_access++;
-  Cache::read(address);
-  
+  bool result = Cache::read(address);
+  // curr_block and curr_set would've been set 
   //update last_use_matrix based on current status
   if(!hit)
     last_use_matrix[curr_set][curr_block] = curr_access;
+  return result;
 }
 
 void LRU_Cache::write(uint64_t address)

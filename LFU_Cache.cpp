@@ -1,6 +1,9 @@
 #include "LFU_Cache.h"
 #include <cstdlib>
+#include <cstdio>
+#include <iostream>
 
+using namespace std;
 LFU_Cache::LFU_Cache(int size, int assoc, int blk_size, int hit_latency): Cache(size, assoc, blk_size, hit_latency, hit_latency)
 {
   //initialise frequency_matrix
@@ -30,16 +33,19 @@ void LFU_Cache::evict(int set)
   
   curr_block = victim;
   curr_set = set;
-  
+  Cache::evict(set);
 }
 
-void LFU_Cache::read(uint64_t address)
+bool LFU_Cache::read(uint64_t address)
 {
-  Cache::read(address);
+ // cout << "hi read" <<endl;
+  bool result = Cache::read(address);
+ 
   if(hit)
     frequency_matrix[curr_set][curr_block]++;
   else
     frequency_matrix[curr_set][curr_block] = 0;
+  return result;
 }
 
 void LFU_Cache::write(uint64_t address)
