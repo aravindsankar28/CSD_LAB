@@ -9,6 +9,9 @@
  * @param n       : Number of caching levels
  * @param address : Address to read from
  */
-void handle_access(Cache** caches, int n, uint64_t address);
+void handle_read(Cache** caches, int n, uint64_t address);
+
+
+void handle_write(Cache** caches, int n, uint64_t address);
 
 #endif
