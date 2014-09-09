@@ -35,8 +35,8 @@ bool RR_Cache::read(uint64_t address)
   return result;
 }
 
-void RR_Cache::write(uint64_t address)
+void RR_Cache::load(uint64_t address)
 {
   curr_access++;
-  Cache::write(address);
+  Cache::load(address);
 }

@@ -48,9 +48,9 @@ bool LFU_Cache::read(uint64_t address)
   return result;
 }
 
-void LFU_Cache::write(uint64_t address)
+void LFU_Cache::load(uint64_t address)
 {
-  Cache::write(address);
+  Cache::load(address);
   if(hit)
     frequency_matrix[curr_set][curr_block]++;
   else

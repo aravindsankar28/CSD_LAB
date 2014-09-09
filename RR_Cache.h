@@ -23,7 +23,7 @@ public:
   void evict(int set);
   RR_Cache(int size, int assoc, int blk_size, int hit_latency);
   bool read(uint64_t address);
-  void write(uint64_t address);
+  void load(uint64_t address);
   
 };
 

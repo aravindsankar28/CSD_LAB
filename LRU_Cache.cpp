@@ -57,9 +57,9 @@ bool LRU_Cache::read(uint64_t address)
   return result;
 }
 
-void LRU_Cache::write(uint64_t address)
+void LRU_Cache::load(uint64_t address)
 {
   curr_access++;
-  Cache::write(address);
+  Cache::load(address);
   last_use_matrix[curr_set][curr_block] = curr_access; // set value as prev. curr_access +1, so as to maintain recency.
 }

@@ -39,6 +39,7 @@ class Cache{
     //Details about memory hierarchy
     Cache* upper_level;
     Cache* lower_level;
+    Cache(int size, int assoc, int blk_size, int hit_latency, int policy);
     /**
      * Find tag from the given address
      * 

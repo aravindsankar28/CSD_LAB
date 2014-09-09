@@ -9,6 +9,7 @@
 #include <cmath>
 #include "Cache.h"
 using namespace std;
+
 Cache::Cache(int size, int assoc, int blk_size, int hit_latency, int policy){
   this->size = size;
   this->assoc = assoc;
@@ -110,7 +111,7 @@ void Cache::load(uint64_t address)
       break;
     }
   }
-  
+  // If hit1 is true, we found an empty block in that set 
   if (!hit1)
   {
     //Free space was not found. Evict a block.
@@ -166,6 +167,7 @@ bool Cache::is_dirty(int set, int block)
 
 void Cache::evict(int set)
 {
+	cout << "Evict " <<endl;
   // To evict cur_set and cur_block 
   uint64_t address1 = (((addrs_stored[curr_set][curr_block] >>2) << map_bits) + set) <<offset_bits ;
   uint64_t address2 = address1 + (1 << offset_bits);
@@ -196,7 +198,7 @@ void Cache::evict(int set)
     }
   
   }
-  
+  cout << "Evict done" <<endl;
   return;
 }
 
@@ -211,6 +213,7 @@ bool Cache::read(uint64_t address)
 
 void Cache::searchAndEvict(int set, uint64_t tag)
 {
+	cout << " s Evict here" <<endl;
   uint64_t address1 = ((tag << map_bits) + set) << offset_bits ;
   uint64_t address2 = address1 + (1 << offset_bits);
   uint64_t i = address1;
@@ -224,8 +227,12 @@ void Cache::searchAndEvict(int set, uint64_t tag)
     }
     i += upper_level->blk_size;
   }
-
+  cout << "s Evict done" <<endl;
 }
 
 
 
+void Cache::write(uint64_t address)
+{
+
+}

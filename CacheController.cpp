@@ -10,6 +10,7 @@ void handle_read(Cache** caches, int n, uint64_t address)
 {
   int i;
   bool hit = false;
+  // Search in each cache starting from L1
   for (i = 0; i < n; ++i)
   {
     uint64_t set = caches[i]->find_set(address);
@@ -21,13 +22,15 @@ void handle_read(Cache** caches, int n, uint64_t address)
       break;
     }
   }
+
   count ++;
   if(hit)
   {
-
+    // This means hit at level i and misses at all levels j < i
     for (int j = 0; j < i; ++j) // misses at all these levels 
     {
-      caches[j]->write(address);
+      // load address in to each of these caches
+      caches[j]->load(address);
     }
   }
   else
@@ -35,7 +38,7 @@ void handle_read(Cache** caches, int n, uint64_t address)
     // miss at all caches
     for (i = 0; i < n; ++i)
     {
-      caches[i]->write(address);
+      caches[i]->load(address);
     }
   }
 }
@@ -87,3 +90,4 @@ void handle_write(Cache** caches, int n, uint64_t address)
   caches[0]->make_dirty(dirty_set, dirty_block);
 }
 
+  
