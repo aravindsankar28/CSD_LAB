@@ -27,7 +27,7 @@ void handle_read(Cache** caches, int n, uint64_t address)
   if(hit)
   {
     // This means hit at level i and misses at all levels j < i
-    for (int j = 0; j < i; ++j) // misses at all these levels 
+    for (int j = i-1; j >= 0; j--) // misses at all these levels 
     {
       // load address in to each of these caches
       caches[j]->load(address);
@@ -36,7 +36,7 @@ void handle_read(Cache** caches, int n, uint64_t address)
   else
   {
     // miss at all caches
-    for (i = 0; i < n; ++i)
+    for (i = n-1; i >= 0; i--)
     {
       caches[i]->load(address);
     }
@@ -67,7 +67,7 @@ void handle_write(Cache** caches, int n, uint64_t address)
   if(hit)
   {
     
-    for (int j = 0; j < i; ++j) // misses at all these levels 
+    for (int j = i-1; j >= 0; j--) // misses at all these levels 
     {
       caches[j]->load(address);
     }
@@ -75,7 +75,7 @@ void handle_write(Cache** caches, int n, uint64_t address)
   else
   {
     // WRITE MISS everywhere.
-    for (i = 0; i < n; ++i)
+    for (i = n-1; i >= 0; i--)
     {
       caches[i]->load(address);
     }

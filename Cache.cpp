@@ -83,7 +83,7 @@ bool Cache::search(int set, uint64_t tag)
 {
   for(int i = 0; i < assoc; i++){
     if((this->addrs_stored[set][i])>>2 == tag){
-      hit = true;
+
       curr_set = set;
       curr_block = i;
       return true;
@@ -98,7 +98,7 @@ bool Cache::search(int set, uint64_t tag)
 // Implementation wise, this is called ONLY when search fails.
 void Cache::load(uint64_t address)
 {
-  
+  accesses ++;
   int set = find_set(address);
   int i = 0;
   bool hit1 = false;
@@ -112,6 +112,7 @@ void Cache::load(uint64_t address)
     }
   }
   // If hit1 is true, we found an empty block in that set 
+
   if (!hit1)
   {
     //Free space was not found. Evict a block.
@@ -157,48 +158,61 @@ void Cache::make_dirty(int set, int block)
 
 bool Cache::is_dirty(int set, int block)
 {
+
   uint64_t stored_value = addrs_stored[set][block];
   int valid_bit = (stored_value >> 1) % 2;
+
   if(valid_bit == 0)
-    return true;
+    {
+    	//cout <<"hi dirty" <<endl;
+    	return true;
+    }
   else
-    return false;
+    {
+    	//cout <<"hi not dirty" <<endl;
+    	return false;
+    }
 }
 
 void Cache::evict(int set)
 {
-	cout << "Evict " <<endl;
+//cout << "Evict " <<endl;
+// Here, we need to do forceful eviction of blocks the upper levels.
   // To evict cur_set and cur_block 
   uint64_t address1 = (((addrs_stored[curr_set][curr_block] >>2) << map_bits) + set) <<offset_bits ;
   uint64_t address2 = address1 + (1 << offset_bits);
   uint64_t i = address1;
-  while(i <= address2 && upper_level != NULL)
+  //cout << "Start while at " <<size <<endl;
+  while(i < address2 && upper_level != NULL)
   {
+  	upper_level->accesses ++;
     if(upper_level->search(upper_level->find_set(i),upper_level->find_tag(i)))
     {
       upper_level->searchAndEvict(upper_level->find_set(i),upper_level->find_tag(i));
     }
     i += upper_level->blk_size;
   }
-  
-  //if block to be evicted is dirty, make it dirty at lower level
+  //cout << "End while" <<size <<endl;
+  // Forceful eviction done.
+
+
+  //if block to be evicted is dirty, make it dirty at lower level (if we have a lower level)
   if(is_dirty(set, curr_block))
   {
+
     i = address1;
-    while(i <= address2)
+  
+    while(i < address2 && lower_level != NULL)
     {
+      lower_level->accesses ++;
       uint64_t lower_set = lower_level->find_set(i);
-      
-      lower_level->search(lower_set, lower_level->find_tag(i));
+      cout <<lower_level->search(lower_set, lower_level->find_tag(i))<<endl;
       int lower_blk = lower_level->curr_block;
-      
       lower_level->make_dirty(lower_set, lower_blk);
-      
       i += lower_level->blk_size;
     }
-  
   }
-  cout << "Evict done" <<endl;
+  //cout << "Evict done" <<endl;
   return;
 }
 
@@ -206,19 +220,22 @@ bool Cache::read(uint64_t address)
 {
     accesses ++;
     bool result = search(find_set(address),find_tag(address));
+    hit = result;
     if(result)
-      hits++;
+     {
+     	hits++;
+     } 
     return result;
 }
 
 void Cache::searchAndEvict(int set, uint64_t tag)
 {
-	cout << " s Evict here" <<endl;
+  //cout << " Search and Evict here" <<endl;
   uint64_t address1 = ((tag << map_bits) + set) << offset_bits ;
   uint64_t address2 = address1 + (1 << offset_bits);
   uint64_t i = address1;
   
-  while(i <= address2 && upper_level != NULL)
+  while(i < address2 && upper_level != NULL)
   {
     if(upper_level->search(upper_level->find_set(i),upper_level->find_tag(i)))
     {
@@ -227,7 +244,7 @@ void Cache::searchAndEvict(int set, uint64_t tag)
     }
     i += upper_level->blk_size;
   }
-  cout << "s Evict done" <<endl;
+  //cout << "Search and Evict done" <<endl;
 }
 
 
