@@ -1,5 +1,0 @@
-1) Matrix allocation : Pointer based allocation is ok or we need array based allocation?
-   Note: Array may significantly reduce cache misses
-   
-2) LFU/LRU: Should we reset the counter/value when the block is invalidated/written into?
-   Current implementation : Resetting is done
