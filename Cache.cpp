@@ -39,6 +39,7 @@ Cache::Cache(int size, int assoc, int blk_size, int hit_latency, int policy){
   //initialise stats
   this->accesses = 0;
   this->hits = 0;
+  this->misses = 0;
   this->miss_ratio = 0;
 }
 
@@ -206,7 +207,7 @@ void Cache::evict(int set)
     {
       lower_level->accesses ++;
       uint64_t lower_set = lower_level->find_set(i);
-      cout <<lower_level->search(lower_set, lower_level->find_tag(i))<<endl;
+      //cout <<lower_level->search(lower_set, lower_level->find_tag(i))<<endl;
       int lower_blk = lower_level->curr_block;
       lower_level->make_dirty(lower_set, lower_blk);
       i += lower_level->blk_size;
@@ -225,6 +226,8 @@ bool Cache::read(uint64_t address)
      {
      	hits++;
      } 
+     else misses ++;
+     
     return result;
 }
 

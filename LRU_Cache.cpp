@@ -47,7 +47,7 @@ void LRU_Cache::evict(int set)
 
 bool LRU_Cache::read(uint64_t address)
 {
-
+  
   curr_access++;
   bool result = Cache::read(address);
   // curr_block and curr_set would've been set 

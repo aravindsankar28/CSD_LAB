@@ -27,8 +27,9 @@ class Cache{
     uint64_t** addrs_stored;  // Matrix of size num_sets x assoc
      
     //Stats
-    int accesses;
-    int hits;
+    uint64_t accesses;
+    uint64_t hits;
+    uint64_t misses;
     int miss_ratio;
     
     //Current Task status : hit/miss and set, block queried

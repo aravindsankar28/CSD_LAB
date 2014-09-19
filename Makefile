@@ -12,5 +12,7 @@ out/RR_Cache.o: RR_Cache.h RR_Cache.cpp
 	g++ -c RR_Cache.cpp -o out/RR_Cache.o -fPIC
 out/Combined.o: combine.cpp
 	g++ -c combine.cpp -o out/Combined.o -fPIC
+clean:	
+	rm out/*
 
 	
