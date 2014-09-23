@@ -1,0 +1,3 @@
+/tmp/ccEZfle0.o: In function `ALU::issue_instruction(int, int, int, int)':
+ALU.cpp:(.text+0x28): undefined reference to `get_cycles(int)'
+collect2: error: ld returned 1 exit status
