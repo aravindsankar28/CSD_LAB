@@ -6,7 +6,7 @@
 void ALU::issue_instruction(int opcode, int src1, int src2, int dest)
 {
   this->curr_opcode = opcode;
-  this->reqd_cycles = get_cycles(opcode);
+  //this->reqd_cycles = get_cycles(opcode);
   this->curr_cycle = 0;
   
   this->src1 = src1;
