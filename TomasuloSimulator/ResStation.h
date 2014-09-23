@@ -27,3 +27,5 @@ class Res_Station{
 public:
   Res_Station(int size);
 };
+
+#endif

@@ -1,19 +1,12 @@
 #ifndef RRF_H
 #define RRF_H
 
+#include <cstdint>
+
 struct RRF_Entry{
   
   // opcode of instruction that has been seen
   uint64_t data;
-
- /*  
-  //ARF registers corresponding to required operands
-  int src1;
-  int src2;
-  
-  //ARF registers corresponding to required sink
-  int dest;
- */  
 
  //busy bit
   int busy;
@@ -29,4 +22,5 @@ class RRF{
 public:
   RRF(int size);
 };
+
 #endif

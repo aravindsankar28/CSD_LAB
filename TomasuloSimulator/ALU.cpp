@@ -1,4 +1,4 @@
-#include "ALU.cpp"
+#include "ALU.h"
 #include "Tomasulo.h"
 
 void ALU::issue_instruction(int opcode, int src1, int src2, int dest)

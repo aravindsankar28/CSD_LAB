@@ -1,9 +1,10 @@
 #include "ROB.h"
 
-ROB(int max_size)
+ROB::ROB(int max_size)
 {
   this->max_size = max_size;
-  entries = new queue<ROB_Entry>();
+  entries = *(new deque<ROB_Entry>());
+
 }
 
 bool ROB::attempt_push(ROB_Entry r)
@@ -15,7 +16,7 @@ bool ROB::attempt_push(ROB_Entry r)
   return false;
 }
 
-void ROB::attempt_pop()
+bool ROB::attempt_pop()
 {
   if (this->entries.empty())
     return false;
