@@ -5,11 +5,15 @@
 #include <string>
 #include <queue>
 
-#include "RRF.h"
-#include "ARF.h"
-#include "ResStation.h"
-#include "DecBuff_Entry.h"
-#include "ROB.h"
+class RRF;
+class ARF;
+class ROB;
+class Res_Station;
+class DecBuff_Entry;
+
+using namespace std;
+
+// #include "Combined.h"
 
 /**
  * Modelled the registers as 64-bit integers
@@ -50,10 +54,10 @@ class Tomasulo{
   /**
    * Elements of the algorithm
    */  
-  ARF arf;
-  RRF rrf;
-  Res_Station rs;
-  ROB rob;
+  ARF *arf;
+  RRF *rrf;
+  Res_Station *rs;
+  ROB *rob;
   
 public:
   string* fetch_instructions();

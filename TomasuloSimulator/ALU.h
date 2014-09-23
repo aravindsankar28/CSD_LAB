@@ -1,7 +1,6 @@
 #ifndef ALU_H
 #define ALU_H
 
-#include "Tomasulo.h"
 class ALU{
   int curr_opcode;
   int reqd_cycles;
