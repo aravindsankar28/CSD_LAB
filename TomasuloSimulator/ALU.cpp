@@ -1,5 +1,6 @@
 #include "ALU.h"
-#include "Tomasulo.h"
+
+#include <stdint.h>
 
 void ALU::issue_instruction(int opcode, int src1, int src2, int dest)
 {

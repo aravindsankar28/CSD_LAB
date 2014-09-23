@@ -1,7 +1,8 @@
 #ifndef ARF_H
 #define ARF_H
 
-#include <cstdint>
+
+#include <stdint.h>
 
 struct ARF_Entry{
   //contents of the register

@@ -1,7 +1,7 @@
 #ifndef TOMASULO_H
 #define TOMASULO_H
 
-#include <cstdint>
+#include <stdint.h>
 #include <string>
 #include <queue>
 

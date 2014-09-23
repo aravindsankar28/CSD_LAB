@@ -1,8 +1,8 @@
 #ifndef RRF_H
 #define RRF_H
 
-#include <cstdint>
 
+#include <stdint.h>
 struct RRF_Entry{
   
   // opcode of instruction that has been seen
