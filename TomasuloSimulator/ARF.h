@@ -22,9 +22,10 @@ struct ARF_Entry{
 
 class ARF{
   int size;
-  ARF_Entry *entries;
+ 
   
 public:
+  ARF_Entry *entries;
   ARF_Entry get_entry(int index);
   ARF(int size);
   //All member functions here

@@ -6,7 +6,7 @@ ARF::ARF(int size)
   this->entries = new ARF_Entry[size];
   for (int i = 0; i < size; ++i)
   {
-  	this->entries[i].index = i+1;
+  	this->entries[i].index = i;
   }
 }
 ARF_Entry ARF::get_entry(int index)

@@ -6,7 +6,7 @@ RRF::RRF(int size)
   this->entries = new RRF_Entry[size];
   for (int i = 0; i < size; ++i)
   {
-  	this->entries[i].index = i+1;
+  	this->entries[i].index = i;
   }
 }
 

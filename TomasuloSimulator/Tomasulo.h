@@ -90,6 +90,9 @@ public:
   void fetch_instructions_to_buffer();
   
   void decode_instructions();
+
+  // Needs to be done before the simulation starts.
+  void initialize_register_file(); 
 };
 
   /**
