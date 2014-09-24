@@ -1,4 +1,4 @@
-#include "DecBuff_Entry.h"
+#include "Decoded_Instruction.h"
 
 #include <string>
 #include <vector>
@@ -6,9 +6,10 @@
 
 using namespace std;
 
-DecBuff_Entry::DecBuff_Entry(string s)
+Decoded_Instruction::Decoded_Instruction(string s)
 {
   this->ops = (operand*) malloc(3*sizeof(operand));
+  
   string tmp;
   vector <string> cds;
   stringstream ss (s);

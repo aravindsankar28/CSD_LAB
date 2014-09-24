@@ -6,6 +6,10 @@
 
 
 struct ARF_Entry{
+
+  // index or number of the register
+  int index;
+
   //contents of the register
   uint64_t data;
   
@@ -21,7 +25,7 @@ class ARF{
   ARF_Entry *entries;
   
 public:
-  
+  ARF_Entry get_entry(int index);
   ARF(int size);
   //All member functions here
 };

@@ -1,0 +1,15 @@
+The instruction format for the third assignment will be:
+opcode dest src src
+For instructions other than load-store, one or both of the src operands can be immediate.
+For load-store, the memory addresss can be immediate.
+Instructions are limted to : add, sub, mul, div, and, or, xor, load, store.
+Note: There will not be any branches.
+
+Examples:
+ADD R1 R2 R3
+ADD R1 R2 5
+MUL R1 R2 R3
+STORE 100 R1 (Store value from R1 at location 100)
+STORE R2 R1 (Store value from R1 at the location pointed to be R2)
+LOAD R1 100 (Load value from location 100 into R1)
+LOAD R1 R2 (Load value into R1 from location pointed to by R2)

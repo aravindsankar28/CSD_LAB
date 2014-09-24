@@ -5,6 +5,9 @@
 #include <stdint.h>
 struct RRF_Entry{
   
+   // index or number of the register
+  int index;
+  
   // opcode of instruction that has been seen
   uint64_t data;
 
@@ -21,6 +24,8 @@ class RRF{
 
 public:
   RRF(int size);
+  int find_non_busy_register();
+  RRF_Entry get_entry(int index);
 };
 
 #endif

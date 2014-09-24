@@ -1,5 +1,5 @@
-#ifndef DEC_BUFF_ENTRY
-#define DEC_BUFF_ENTRY
+#ifndef DECODED_INSTRUCTION_H
+#define DECODED_INSTRUCTION_H
 
 #include <string>
 #include <vector>
@@ -15,12 +15,12 @@ public:
   operand(int value, bool is_immediate);
 };
 
-struct DecBuff_Entry{
+struct Decoded_Instruction{
 public:
   string opcode;
   operand *ops; 
   
-  DecBuff_Entry(string s);
+  Decoded_Instruction(string s);
 };
 
 #endif

@@ -4,16 +4,19 @@
 #include <stdint.h>
 #include <string>
 #include <queue>
+#include <vector>
 
-class RRF;
-class ARF;
-class ROB;
-class Res_Station;
-class DecBuff_Entry;
+
+#include "RRF.h"
+#include "ARF.h"
+#include "ResStation.h"
+#include "Decoded_Instruction.h"
+#include "ROB.h"
+
 
 using namespace std;
 
-// #include "Combined.h"
+
 
 /**
  * Modelled the registers as 64-bit integers
@@ -41,15 +44,20 @@ class Tomasulo{
    */
   int issue_size;
   
-  /**
-   * Buffer between fetch and decode-I stage
-   */
+  int max_instruction_buffer_size ;
+  /*Fetched instructions are kept here at the end of FETCH STAGE */ 
+
+  queue<string> *instruction_buffer;
+
+
+  queue<string> *instruction_cache; // has all instructions
+
   queue<string>* fetchBuff;
   
   /**
    * Buffer between decode-I and decode-II
    */
-  queue<DecBuff_Entry> decodeBuff;
+  //queue<Decoded_Instruction> decodeBuff;
   
   /**
    * Elements of the algorithm
@@ -60,9 +68,28 @@ class Tomasulo{
   ROB *rob;
   
 public:
-  string* fetch_instructions();
+  Tomasulo(int num_arch_reg, int num_renamed_reg,int num_rs_entries,int issue_size, ROB *rob,Res_Station *rs, ARF *arf, RRF *rrf)
+  {
+    this->num_arch_reg = num_arch_reg;
+    this->num_renamed_reg= num_renamed_reg;
+    this->num_rs_entries = num_rs_entries;
+    this->issue_size = issue_size;
+    this->rob = rob;
+    this->rs = rs;
+    this->arf = arf;
+    this-> rrf = rrf;
+    this->instruction_cache = new queue<string>();
+    this->instruction_buffer = new queue<string>();
+    this->max_instruction_buffer_size = 4;
+  }
+
+// done only once
+  void fetch_instructions_to_cache();
   
-  //DecBuff_Entry* decode_instruction(string);
+  // done at fetch stage
+  void fetch_instructions_to_buffer();
+  
+  void decode_instructions();
 };
 
   /**
