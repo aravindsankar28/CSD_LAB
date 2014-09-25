@@ -10,6 +10,9 @@ struct ROB_Entry{
 public:
   int tag;
   bool exec;
+  
+  ROB_Entry(int tag, bool exec);
+  ROB_Entry();
 };
 
 

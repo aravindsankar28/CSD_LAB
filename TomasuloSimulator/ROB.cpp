@@ -1,5 +1,17 @@
 #include "ROB.h"
 
+ROB_Entry::ROB_Entry(int tag, bool exec)
+{
+  this->tag = tag;
+  this->exec = exec;
+}
+
+ROB_Entry::ROB_Entry()
+{
+  this->tag = -1;
+  this->exec = false;
+}
+
 ROB::ROB(int max_size)
 {
   this->max_size = max_size;
@@ -23,7 +35,8 @@ bool ROB::attempt_pop()
   
   ROB_Entry re = this->entries.front();
   if(re.exec){
-    this->scratch = this->entries.pop_front();
+    this->scratch = this->entries.front();
+    this->entries.pop_front();
     //TODO: Need to inform RRF here
     return true;
   }
