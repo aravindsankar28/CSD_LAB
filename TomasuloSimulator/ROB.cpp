@@ -23,7 +23,7 @@ bool ROB::attempt_pop()
   
   ROB_Entry re = this->entries.front();
   if(re.exec){
-    this->entries.pop_front();
+    this->scratch = this->entries.pop_front();
     //TODO: Need to inform RRF here
     return true;
   }
