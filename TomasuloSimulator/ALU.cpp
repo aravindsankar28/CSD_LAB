@@ -9,6 +9,7 @@ void ALU::issue_instruction(string opcode, int src1, int src2, int dest, ROB* ro
   this->reqd_cycles = get_cycles(opcode);
   this->curr_cycle = 0;
   this->is_busy = true;
+  this->commit = false;
   this->src1 = src1;
   this->src2 = src2;
   this->dest = dest;
@@ -24,7 +25,9 @@ void ALU::commit()
    */
   this->rob->set_complete(this->dest);
   RRF_Entry *re = this->rrf->get_entry(this->dest);
-  re->valid = false;
+  re->valid = true;
+  this->is_busy = false;
+  this->commit = false;
   
 }
 
@@ -32,8 +35,8 @@ void ALU::run()
 {
   this->curr_cycle++;
   if(this->curr_cycle == this->reqd_cycles){
-    this->calculate();
-    this->commit();
+    this->scratch = this->calculate();
+    commit = true;
   }
 }
 

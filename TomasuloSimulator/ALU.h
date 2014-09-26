@@ -23,9 +23,11 @@ class ALU{
   int src1;
   int src2;
   int dest;
+  int scratch;
   
   ROB* rob;
   RRF* rrf;
+  bool commit;
   int calculate();
   
 public:
