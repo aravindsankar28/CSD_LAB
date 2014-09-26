@@ -164,3 +164,24 @@ void Tomasulo::decode_instructions()
 
 	}
 }
+
+Tomasulo::Tomasulo(int num_arch_reg, int num_renamed_reg, int num_rs_entries, int issue_size, ROB* rob, Res_Station* rs, ARF* arf, RRF* rrf)
+{
+    this->num_arch_reg = num_arch_reg;
+    this->num_renamed_reg= num_renamed_reg;
+    this->num_rs_entries = num_rs_entries;
+    this->issue_size = issue_size;
+    this->rob = rob;
+    this->rs = rs;
+    this->arf = arf;
+    this-> rrf = rrf;
+    this->instruction_cache = new queue<string>();
+    this->instruction_buffer = new queue<string>();
+    this->max_instruction_buffer_size = 4;
+}
+
+int get_cycles(int opcode)
+{
+  return 1;
+}
+

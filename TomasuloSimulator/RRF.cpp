@@ -19,7 +19,7 @@ int RRF::find_non_busy_register()
 	}
 	return -1;
 }
-RRF_Entry RRF::get_entry(int index)
+RRF_Entry* RRF::get_entry(int index)
 {
-	return this->entries[index];
+	return &(this->entries[index]);
 }

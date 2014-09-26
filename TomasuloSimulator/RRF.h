@@ -20,13 +20,11 @@ struct RRF_Entry{
 
 class RRF{
   int size;
-  
-
 public:
   RRF_Entry *entries;
   RRF(int size);
   int find_non_busy_register();
-  RRF_Entry get_entry(int index);
+  RRF_Entry* get_entry(int index);
 };
 
 #endif
