@@ -28,6 +28,8 @@ using namespace std;
 //typedef reg uint64_t;
 
 class Tomasulo{
+
+  int curr_instr;
   /**
    * This must be equal to number of entries in ARF
    */
@@ -89,6 +91,8 @@ public:
   void decode_instructions();
 
   void execute_instructions();
+
+  void commit_instructions();
 
   void simulate();
 

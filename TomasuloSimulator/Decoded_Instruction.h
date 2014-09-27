@@ -18,6 +18,7 @@ public:
 
 struct Decoded_Instruction{
 public:
+  int instruction_number;
   string opcode;
   operand *ops; 
   

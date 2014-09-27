@@ -35,6 +35,7 @@ bool ROB::attempt_pop()
   
   ROB_Entry re = this->entries.front();
   if(re.exec){
+    cout << "Popping from rob to commit and retire" <<endl;
     this->scratch = this->entries.front();
     this->entries.pop_front();
     //TODO: Need to inform RRF here
@@ -51,5 +52,10 @@ void ROB::set_complete(int tag)
       this->entries[i].exec = true;
     }
   }
+}
+
+int ROB::get_size()
+{
+  return this->entries.size();
 }
 

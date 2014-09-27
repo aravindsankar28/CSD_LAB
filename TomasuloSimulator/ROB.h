@@ -2,7 +2,7 @@
 #define ROB_H
 
 #include <deque>
-
+#include <iostream>
 
 using namespace std;
 
@@ -10,14 +10,16 @@ struct ROB_Entry{
 public:
   int tag;
   bool exec;
-  
+  int instruction_number;
+
+
   ROB_Entry(int tag, bool exec);
   ROB_Entry();
 };
 
 
 class ROB{
-  int max_size;
+
   deque<ROB_Entry> entries;
  
   /**
@@ -30,6 +32,7 @@ public:
    * Constructor.
    * @param max_size	:Size of the ROB
    */
+  int max_size;
   ROB(int max_size);
  
   /**
@@ -53,6 +56,7 @@ public:
    * @param tag   : Instruction to be set to executed
    */
   void set_complete(int tag);
+  int get_size();
 };
 
 #endif

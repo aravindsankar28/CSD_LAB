@@ -20,6 +20,7 @@ Tomasulo::Tomasulo(int num_arch_reg, int num_renamed_reg, int num_rs_entries, in
     this->instruction_buffer = new queue<string>();
     this->max_instruction_buffer_size = 4;
     this->cycle = 0;
+    this->curr_instr = 0;
 }
 
 void Tomasulo::fetch_instructions_to_cache()
@@ -48,12 +49,13 @@ void Tomasulo::fetch_instructions_to_buffer()
 void Tomasulo::decode_instructions()
 {
 	int i = 0;
-	while(i < issue_size && instruction_buffer->size() > 0 && rs->size < rs->max_size)
+	while(i < issue_size && instruction_buffer->size() > 0 && rs->size < rs->max_size && rob->get_size() < rob->max_size)
 	{
 		string instruction = instruction_buffer->front(); // fetch the first instruction from buffer.
 		// Now actually decode to get oopcode and perands
 
 		Decoded_Instruction *decoded_instruction = new Decoded_Instruction(instruction);
+		curr_instr ++;
 		/*cout << decoded_instruction->opcode<<" "<< decoded_instruction->ops[0].value << 
 		decoded_instruction->ops[1].value << decoded_instruction->ops[2].value<<  endl;*/
 
@@ -80,7 +82,7 @@ void Tomasulo::decode_instructions()
 		arf->entries[dest.value] = arf_entry_dest;
 
 		Res_Station_Entry* res_station_entry =  rs->get_free_entry();
-
+		res_station_entry->instruction_number = curr_instr;
 		res_station_entry->dest_tag = found_dest_reg; // set destination tag
 		// Source Read
 		// Now check src1 and src2 in the register files.
@@ -169,12 +171,16 @@ void Tomasulo::decode_instructions()
 			//if(rs->size < rs->max_size)
 			//	rs->add_entry(res_station_entry);
 
+		ROB_Entry* rob_entry = new ROB_Entry();
+		rob_entry->instruction_number = curr_instr;
+		rob_entry->tag = res_station_entry->dest_tag;
+		bool flag = rob->attempt_push(*rob_entry);
+		if(! flag)
+			cout <<"ERROR" <<endl;
 
 		instruction_buffer->pop();
 
 		i++;
-
-
 
 	}
 }
@@ -190,17 +196,26 @@ void Tomasulo::simulate()
 	while(cycle < 4)
 	{
 		cout << "At start of Cycle "<< cycle << endl;
+		commit_instructions();
 		execute_instructions();
 		decode_instructions();
 		fetch_instructions_to_buffer();
 		cycle ++;
 
+		for (int i = 0; i < NUM_INT_UNITS; ++i)
+		{
+			alu[i].commit();
+		}
 		//display_arf();
 		//display_rrf();
 		//display_rs();
 	}
 	cout << instruction_buffer->size()<<endl;
 
+}
+void Tomasulo::commit_instructions()
+{
+	rob->attempt_pop();
 }
 void Tomasulo::execute_instructions()
 {
@@ -254,7 +269,7 @@ void Tomasulo::execute_instructions()
 					{
 						cout << "Can schedule on ALU " << j <<" : ";
 						rs_entry->display();
-						alu[j].issue_instruction(opcode_code,rs_entry->src1_data,rs_entry->src2_data,rs_entry->dest_tag,rob,rrf);
+						alu[j].issue_instruction(rs_entry->instruction_number,opcode_code,rs_entry->src1_data,rs_entry->src2_data,rs_entry->dest_tag,rob,rrf);
 						// Issued instruction to a free ALU - so  remove that entry from reservation station and break.
 						rs->remove_entry(rs_entry);
 						break;
@@ -267,6 +282,13 @@ void Tomasulo::execute_instructions()
 			}
 		}
 	}
+	// Instruction issuing to ALU's completed.
+	// Now call ALU to run
+	for (int i = 0; i < NUM_INT_UNITS; ++i)
+	{
+		alu[i].run();
+	}
+
 }
 
 void Tomasulo::display_arf()

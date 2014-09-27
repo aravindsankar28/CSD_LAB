@@ -3,11 +3,12 @@
 #include "Tomasulo.h"
 #include <stdint.h>
 
-void ALU::issue_instruction(int opcode, int src1, int src2, int dest, ROB* rob, RRF* rrf )
+void ALU::issue_instruction(int instruction_number,int opcode, int src1, int src2, int dest, ROB* rob, RRF* rrf )
 {
+  this->instruction_number = instruction_number;
   this->curr_opcode = opcode;
   //this->reqd_cycles = get_cycles(opcode);
-  this->reqd_cycles = 2; // For now
+  this->reqd_cycles = 1; // For now
   this->curr_cycle = 0;
   this->is_busy = true;
   this->commited = false;
@@ -16,7 +17,7 @@ void ALU::issue_instruction(int opcode, int src1, int src2, int dest, ROB* rob, 
   this->dest = dest;
   this->rob = rob;
   this->rrf = rrf;
-  cout << "instruction " << opcode << " issued on ALU "<<endl;
+  cout << "instruction " << this->instruction_number << " issued on ALU "<<endl;
 }
 
 void ALU::commit()
@@ -25,18 +26,22 @@ void ALU::commit()
    * Set the bit in ROB
    * Change valid bit and data field of RRF entry
    */
-  this->rob->set_complete(this->dest);
-  RRF_Entry *re = this->rrf->get_entry(this->dest);
-  re->valid = true;
-  this->is_busy = false;
-  this->commited = false;
-  
+  if(this->commited)
+    {
+      this->rob->set_complete(this->dest);
+      RRF_Entry *rrf_entry = this->rrf->get_entry(this->dest);
+      rrf_entry->valid = true;
+      //this->is_busy = false;
+      this->commited = false;
+      rrf_entry->valid = true;
+      rrf_entry->data = this->scratch;  
+    }
 }
 
 void ALU::run()
 {
   this->curr_cycle++;
-  if(this->curr_cycle == this->reqd_cycles){
+  if(this->is_busy && this->curr_cycle == this->reqd_cycles){
     this->scratch = this->calculate();
     commited = true;
   }

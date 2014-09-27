@@ -26,7 +26,7 @@ class ALU{
   int src2; // value
   int dest; // rrf tag
   int scratch;
-  
+  int instruction_number;
   ROB* rob;
   RRF* rrf;
   bool commited;
@@ -35,7 +35,7 @@ class ALU{
 public:
 
   bool is_busy;
-  void issue_instruction(int opcode, int src1, int src2, int dest, ROB* rob, RRF* rrf);
+  void issue_instruction(int instruction_number,int opcode, int src1, int src2, int dest, ROB* rob, RRF* rrf);
   
   /**
    * Commit result of instruction to ROB/RRF
@@ -47,6 +47,11 @@ public:
    * Executed once every cycle.
    */
   void run();
+
+  ALU()
+  {
+    commited = false;
+  }
 };
   
 #endif
