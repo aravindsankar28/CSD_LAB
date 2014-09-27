@@ -3,13 +3,17 @@
 
 
 #include <stdint.h>
+#include <iostream>
+
+using namespace std;
+
 struct RRF_Entry{
   
    // index or number of the register
   int index;
   
   // opcode of instruction that has been seen
-  uint64_t data;
+  int data;
 
  //busy bit
   int busy;
@@ -25,6 +29,7 @@ public:
   RRF(int size);
   int find_non_busy_register();
   RRF_Entry* get_entry(int index);
+  void display();
 };
 
 #endif

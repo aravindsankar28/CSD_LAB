@@ -12,6 +12,10 @@
 #include "ResStation.h"
 #include "Decoded_Instruction.h"
 #include "ROB.h"
+#include "ALU.h"
+
+#define MAX_MEM 100
+#define NUM_INT_UNITS 2
 
 
 using namespace std;
@@ -44,6 +48,8 @@ class Tomasulo{
    */
   int issue_size;
   
+  int cycle;
+
   int max_instruction_buffer_size ;
   /*Fetched instructions are kept here at the end of FETCH STAGE */ 
 
@@ -66,6 +72,9 @@ class Tomasulo{
   RRF *rrf;
   Res_Station *rs;
   ROB *rob;
+  int Memory[MAX_MEM+1];
+
+  ALU alu[NUM_INT_UNITS];
   
 public:
   Tomasulo(int num_arch_reg, int num_renamed_reg,int num_rs_entries,int issue_size, ROB *rob,Res_Station *rs, ARF *arf, RRF *rrf);
@@ -79,14 +88,31 @@ public:
   
   void decode_instructions();
 
-  // Needs to be done before the simulation starts.
+  void execute_instructions();
+
+  void simulate();
+
+  void display_arf();
+
+  void display_rrf();
+
+  void display_rs();
+
+  // Needs to be done before the simulation starts - TODO
   void initialize_register_file(); 
+
+  void initialize_memory();
+
+  int opcode_helper(string opcode);
+
 };
 
   /**
   * Get number of cycles reqd fr execution of opcode.
   */
   int get_cycles(int opcode);
+
+ 
 
 
 

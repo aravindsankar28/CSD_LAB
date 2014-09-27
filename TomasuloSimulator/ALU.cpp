@@ -3,18 +3,20 @@
 #include "Tomasulo.h"
 #include <stdint.h>
 
-void ALU::issue_instruction(string opcode, int src1, int src2, int dest, ROB* rob, RRF* rrf )
+void ALU::issue_instruction(int opcode, int src1, int src2, int dest, ROB* rob, RRF* rrf )
 {
   this->curr_opcode = opcode;
-  this->reqd_cycles = get_cycles(opcode);
+  //this->reqd_cycles = get_cycles(opcode);
+  this->reqd_cycles = 2; // For now
   this->curr_cycle = 0;
   this->is_busy = true;
-  this->commit = false;
+  this->commited = false;
   this->src1 = src1;
   this->src2 = src2;
   this->dest = dest;
   this->rob = rob;
   this->rrf = rrf;
+  cout << "instruction " << opcode << " issued on ALU "<<endl;
 }
 
 void ALU::commit()
@@ -27,7 +29,7 @@ void ALU::commit()
   RRF_Entry *re = this->rrf->get_entry(this->dest);
   re->valid = true;
   this->is_busy = false;
-  this->commit = false;
+  this->commited = false;
   
 }
 
@@ -36,7 +38,7 @@ void ALU::run()
   this->curr_cycle++;
   if(this->curr_cycle == this->reqd_cycles){
     this->scratch = this->calculate();
-    commit = true;
+    commited = true;
   }
 }
 

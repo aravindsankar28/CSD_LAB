@@ -12,6 +12,8 @@
 #define AND 4
 #define OR 5
 #define XOR 6
+#define LOAD 7
+#define STORE 8
 
 using namespace std;
 
@@ -19,25 +21,20 @@ class ALU{
   int curr_opcode;
   int reqd_cycles;
   int curr_cycle;
-  bool is_busy;
-  int src1;
-  int src2;
-  int dest;
+ 
+  int src1; // value
+  int src2; // value
+  int dest; // rrf tag
   int scratch;
   
   ROB* rob;
   RRF* rrf;
-  bool commit;
+  bool commited;
   int calculate();
   
 public:
-  /**
-   * Issue an instruction to the ALU.
-   * @param opcode : opcode of operation to be executed
-   * @param src1   : Reanmed register corr to src 1
-   * @param src2   : Reanmed register corr to src 2
-   * @param dest   : Reanmed register corr to destiation
-   */
+
+  bool is_busy;
   void issue_instruction(int opcode, int src1, int src2, int dest, ROB* rob, RRF* rrf);
   
   /**

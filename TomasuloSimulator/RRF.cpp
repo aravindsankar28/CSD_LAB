@@ -23,3 +23,13 @@ RRF_Entry* RRF::get_entry(int index)
 {
 	return &(this->entries[index]);
 }
+
+void RRF::display()
+{
+	cout << "Reg"<<"\t"<<"Data"<<"\t" <<"Busy" <<"\t"<<"Valid"<<endl;
+	for (int i = 0; i < this->size; ++i)
+	{
+		cout << this->entries[i].index << "\t" << this->entries[i].data << "\t" << this->entries[i].busy << "\t" 
+		<< this->entries[i].valid <<endl;
+	}
+}

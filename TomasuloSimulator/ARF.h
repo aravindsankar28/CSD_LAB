@@ -3,15 +3,16 @@
 
 
 #include <stdint.h>
+#include <iostream>
 
-
+using namespace std;
 struct ARF_Entry{
 
   // index or number of the register
   int index;
 
   //contents of the register
-  uint64_t data;
+  int data;
   
   //index of entry in RRF that corresponds to this register
   int tag;
@@ -26,8 +27,9 @@ class ARF{
   
 public:
   ARF_Entry *entries;
-  ARF_Entry get_entry(int index);
+  ARF_Entry* get_entry(int index);
   ARF(int size);
+  void display();
   //All member functions here
 };
 

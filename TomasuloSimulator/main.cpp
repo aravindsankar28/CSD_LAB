@@ -13,10 +13,7 @@ int main(int argc, char **argv) {
     ARF *arf = new ARF(8);
     RRF *rrf = new RRF(8);
     Tomasulo t(8,8,8,2,rob,rs,arf,rrf);
-    t.fetch_instructions_to_cache();
-
-    t.fetch_instructions_to_buffer();
-    
-    t.decode_instructions();
+    t.simulate();
+    t.opcode_helper("ADD");
     return 0;
 }

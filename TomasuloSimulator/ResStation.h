@@ -12,13 +12,15 @@ class Res_Station_Entry{
 public:
   // opcode of instruction that has been seen
   string opcode;
-  
+
+  int instruction_number;
+
   //RRF index corresponding to required operands
   int src1_tag;
   int src2_tag;
   
-  uint64_t src1_data;
-  uint64_t src2_data;
+  int src1_data;
+  int src2_data;
 
   int src1_data_present;
   int src2_data_present;
@@ -32,6 +34,10 @@ public:
   bool busy;  
   //TODO: Do we need valid and busy bits here?
 
+  int index;
+
+  void display();
+
  Res_Station_Entry();
 };
 
@@ -42,7 +48,10 @@ public:
   int size;
   int max_size;
   Res_Station(int max_size);
-  void add_entry(Res_Station_Entry res_station_entry);
+  Res_Station_Entry* get_free_entry();
+  Res_Station_Entry* get_entry(int index);
+  void display();
+  void remove_entry(Res_Station_Entry* res_station_entry);
 };
 
 #endif
