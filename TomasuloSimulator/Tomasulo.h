@@ -16,7 +16,7 @@
 
 #define MAX_MEM 100
 #define NUM_INT_UNITS 2
-
+#define NUM_INSTRUCTION_TYPES 9
 
 using namespace std;
 
@@ -75,7 +75,7 @@ class Tomasulo{
   Res_Station *rs;
   ROB *rob;
   int Memory[MAX_MEM+1];
-
+  int instruction_cycles[NUM_INSTRUCTION_TYPES];
   ALU alu[NUM_INT_UNITS];
   
 public:
@@ -102,12 +102,14 @@ public:
 
   void display_rs();
 
+  int opcode_helper(string opcode);
+
   // Needs to be done before the simulation starts - TODO
   void initialize_register_file(); 
 
   void initialize_memory();
 
-  int opcode_helper(string opcode);
+  void initialize_instruction_cycles();
 
 };
 

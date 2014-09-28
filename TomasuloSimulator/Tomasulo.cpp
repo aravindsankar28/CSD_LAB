@@ -42,6 +42,7 @@ void Tomasulo::fetch_instructions_to_buffer()
 		string instruction = instruction_cache->front();
 		instruction_cache->pop();
 		instruction_buffer->push(instruction);
+		cout << "Fetching instruction "<<instruction <<endl;
 		i++;
 	}
 }
@@ -55,10 +56,11 @@ void Tomasulo::decode_instructions()
 		// Now actually decode to get oopcode and perands
 
 		Decoded_Instruction *decoded_instruction = new Decoded_Instruction(instruction);
+
 		curr_instr ++;
 		/*cout << decoded_instruction->opcode<<" "<< decoded_instruction->ops[0].value << 
 		decoded_instruction->ops[1].value << decoded_instruction->ops[2].value<<  endl;*/
-
+		cout << "Decoding Instruction "<<instruction <<" "<<curr_instr <<endl;
 		operand dest = decoded_instruction->ops[0];
 		operand src1 = decoded_instruction->ops[1];
 		operand src2 = decoded_instruction->ops[2];
@@ -193,24 +195,27 @@ void Tomasulo::simulate()
 	// For now 
 	fetch_instructions_to_cache();
 
-	while(cycle < 4)
+	while(cycle < 10)
 	{
 		cout << "At start of Cycle "<< cycle << endl;
 		commit_instructions();
 		execute_instructions();
 		decode_instructions();
 		fetch_instructions_to_buffer();
+
 		cycle ++;
 
 		for (int i = 0; i < NUM_INT_UNITS; ++i)
 		{
 			alu[i].commit();
 		}
+
 		//display_arf();
 		//display_rrf();
 		//display_rs();
 	}
-	cout << instruction_buffer->size()<<endl;
+	cout << "all done" <<endl;
+	//cout << instruction_buffer->size()<<endl;
 
 }
 void Tomasulo::commit_instructions()
@@ -267,7 +272,7 @@ void Tomasulo::execute_instructions()
 				{
 					if(! alu[j].is_busy)
 					{
-						cout << "Can schedule on ALU " << j <<" : ";
+						cout << "Scheduling Instruction " <<rs_entry->instruction_number<<" on ALU " << j <<" : ";
 						rs_entry->display();
 						alu[j].issue_instruction(rs_entry->instruction_number,opcode_code,rs_entry->src1_data,rs_entry->src2_data,rs_entry->dest_tag,rob,rrf);
 						// Issued instruction to a free ALU - so  remove that entry from reservation station and break.

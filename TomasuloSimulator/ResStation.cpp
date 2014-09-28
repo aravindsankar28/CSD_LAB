@@ -49,7 +49,7 @@ void Res_Station::display()
 }
 void Res_Station_Entry::display()
 {
-	cout << opcode <<"\t"<<dest_tag << "\t" <<src1_data <<"\t"<<src2_data <<endl;
+	cout << opcode <<"\t("<<dest_tag << ")\t" <<src1_data <<"\t"<<src2_data <<endl;
 }
 Res_Station_Entry* Res_Station::get_entry(int index)
 {
