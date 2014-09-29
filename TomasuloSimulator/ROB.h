@@ -25,13 +25,14 @@ class ROB{
   /**
    * Scratch space to store the popped out entry
    */
-  ROB_Entry scratch;
+  
 public:
   
   /**
    * Constructor.
    * @param max_size	:Size of the ROB
    */
+  ROB_Entry scratch;
   int max_size;
   ROB(int max_size);
  

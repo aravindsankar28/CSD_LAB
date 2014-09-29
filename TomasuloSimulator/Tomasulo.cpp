@@ -21,6 +21,7 @@ Tomasulo::Tomasulo(int num_arch_reg, int num_renamed_reg, int num_rs_entries, in
     this->max_instruction_buffer_size = 4;
     this->cycle = 0;
     this->curr_instr = 0;
+    this->alu = new ALU[NUM_INT_UNITS];
 }
 
 void Tomasulo::fetch_instructions_to_cache()
@@ -195,10 +196,10 @@ void Tomasulo::simulate()
 	// For now 
 	fetch_instructions_to_cache();
 
-	while(cycle < 10)
+	while(rob->get_size()>0 || instruction_cache->size() >0)
 	{
 		cout << "At start of Cycle "<< cycle << endl;
-		commit_instructions();
+		bool rob_popped = commit_instructions();
 		execute_instructions();
 		decode_instructions();
 		fetch_instructions_to_buffer();
@@ -210,6 +211,23 @@ void Tomasulo::simulate()
 			alu[i].commit();
 		}
 
+
+		if(rob_popped)
+		{
+			rrf->entries[rob->scratch.tag].busy = 0;
+			rrf->entries[rob->scratch.tag].valid = 0;
+			//cout << rob->scratch.tag <<endl;
+			for (int i = 0; i < arf->size; ++i)
+			{
+				if(arf->entries[i].tag == rob->scratch.tag)
+					{
+						// found an arf entry.
+						arf->entries[i].data = rrf->entries[rob->scratch.tag].data;
+						arf->entries[i].busy = 0;
+					}
+			}
+			// not found => put peace
+		}
 		//display_arf();
 		//display_rrf();
 		//display_rs();
@@ -218,15 +236,18 @@ void Tomasulo::simulate()
 	//cout << instruction_buffer->size()<<endl;
 
 }
-void Tomasulo::commit_instructions()
+bool Tomasulo::commit_instructions()
 {
-	rob->attempt_pop();
+	return rob->attempt_pop();
+
 }
 void Tomasulo::execute_instructions()
 {
 	// Res station should check all entries in arf and rrf and update it's entries. (Why ?)
-	// 
-	
+	rs->display();
+	/*cout << rs->get_entry(0)->src1_data_present <<endl;
+	cout << rs->get_entry(0)->src2_data_present <<endl;*/
+
 	for (int i = 0; i < rs->max_size ; ++i)
 	{
 		Res_Station_Entry* rs_entry = rs->get_entry(i);
@@ -266,12 +287,15 @@ void Tomasulo::execute_instructions()
 			// Now look at opcode for non-load / store instuctions
 			if(rs_entry->opcode != "LOAD" && rs_entry->opcode != "STORE")
 			{
+
 				int opcode_code = opcode_helper(rs_entry->opcode);
 				// check if any ALU is currently free.
 				for (int j = 0; j < NUM_INT_UNITS; ++j)
 				{
+
 					if(! alu[j].is_busy)
 					{
+
 						cout << "Scheduling Instruction " <<rs_entry->instruction_number<<" on ALU " << j <<" : ";
 						rs_entry->display();
 						alu[j].issue_instruction(rs_entry->instruction_number,opcode_code,rs_entry->src1_data,rs_entry->src2_data,rs_entry->dest_tag,rob,rrf);

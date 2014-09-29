@@ -76,7 +76,7 @@ class Tomasulo{
   ROB *rob;
   int Memory[MAX_MEM+1];
   int instruction_cycles[NUM_INSTRUCTION_TYPES];
-  ALU alu[NUM_INT_UNITS];
+  ALU *alu;
   
 public:
   Tomasulo(int num_arch_reg, int num_renamed_reg,int num_rs_entries,int issue_size, ROB *rob,Res_Station *rs, ARF *arf, RRF *rrf);
@@ -92,7 +92,7 @@ public:
 
   void execute_instructions();
 
-  void commit_instructions();
+  bool commit_instructions();
 
   void simulate();
 

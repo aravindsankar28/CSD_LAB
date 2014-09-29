@@ -28,13 +28,17 @@ void ALU::commit()
    */
   if(this->commited)
     {
+
       this->rob->set_complete(this->dest);
       RRF_Entry *rrf_entry = this->rrf->get_entry(this->dest);
       rrf_entry->valid = true;
-      //this->is_busy = false;
+      this->is_busy = false;
       this->commited = false;
       rrf_entry->valid = true;
+
       rrf_entry->data = this->scratch;  
+      cout << "ALU Commit done of instruction "<< this->instruction_number<<endl;
+      
     }
 }
 
@@ -43,7 +47,8 @@ void ALU::run()
   this->curr_cycle++;
   if(this->is_busy && this->curr_cycle == this->reqd_cycles){
     this->scratch = this->calculate();
-    commited = true;
+    this->commited = true;
+    cout << "Finished calculation of instruction "<<this->instruction_number<<endl;
   }
 }
 

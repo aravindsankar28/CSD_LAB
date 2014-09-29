@@ -22,7 +22,9 @@ ROB::ROB(int max_size)
 bool ROB::attempt_push(ROB_Entry r)
 {
   if (this->entries.size() < max_size){
+    cout << "Pushing to rob instruction "<< r.instruction_number <<endl;
     this->entries.push_back(r);
+
     return true;
   }
   return false;
@@ -30,15 +32,19 @@ bool ROB::attempt_push(ROB_Entry r)
 
 bool ROB::attempt_pop()
 {
+
   if (this->entries.empty())
     return false;
   
   ROB_Entry re = this->entries.front();
+
   if(re.exec){
-    cout << "Popping from rob to commit and retire" <<endl;
+    cout << "Popping from rob to commit and retire instruction "<< re.instruction_number <<endl;
     this->scratch = this->entries.front();
     this->entries.pop_front();
-    //TODO: Need to inform RRF here
+    //TODO: Need to inform RRF and ARF here.
+    
+
     return true;
   }
   else
@@ -47,11 +53,17 @@ bool ROB::attempt_pop()
 
 void ROB::set_complete(int tag)
 {
+
   for(int i = 0; i < this->entries.size(); i++){
+    
     if(this->entries[i].tag == tag){
+      cout << "Setting exec to true for instruction "<< this->entries[i].instruction_number <<endl;
       this->entries[i].exec = true;
     }
   }
+
+
+cout <<endl;
 }
 
 int ROB::get_size()
