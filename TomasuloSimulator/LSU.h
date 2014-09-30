@@ -3,13 +3,16 @@
 
 #include <string>
 #include <deque>
-#include "ROB.h"
+
 #include "RRF.h"
 
 #define LOAD 7
 #define STORE 8
 
 using namespace std;
+
+class ROB;
+
 class Store_Queue_Entry{
 public:
   int instruction_number;
@@ -17,6 +20,8 @@ public:
   int data_to_store;
   int has_been_overtaken;
   int latency_timer;
+  
+  bool completed;
 
   Store_Queue_Entry()
   {

@@ -244,21 +244,50 @@ void Tomasulo::simulate()
 			{
 				ROB_Entry scratch = rob->scratch_queue.front();
 				
-				rrf->entries[scratch.tag].busy = 0;
-				rrf->entries[scratch.tag].valid = 0;
-				//cout << rob->scratch.tag <<endl;
-				for (int i = 0; i < arf->size; ++i)
-				{
+				//Get instrution number of this instruction
+				int ip = scratch.instruction_number;
+				
+				//Check if it is a store instruction
+				iterator<Store_Queue_Entry> iter = lsu->store_queue.begin();
+				bool is_store_instr = false;
+				//pointer to entry in store queue
+				Store_Queue_Entry *sqe;
+				while (iter != lsu->store_queue.end()){
+				  sqe = &(*iter);
+				  
+				  //if this is true, then the instruction corresponds to a store
+				  if(sqe->instruction_number == ip){
+				    is_store_instr = true;
+				    break;
+				  }
+				  iter++;
+				}
+				
+				//This is a store instruction.
+				//Note: sqe points to the corresponding entry in store queue
+				if (is_store_instr){
+				  sqe->completed = true;
+				}
+				
+				else{
+				  rrf->entries[scratch.tag].busy = 0;
+				  rrf->entries[scratch.tag].valid = 0;
+				  //cout << rob->scratch.tag <<endl;
+				  for (int i = 0; i < arf->size; ++i)
+				  {
 					if(arf->entries[i].tag == scratch.tag)
 						{
 							// found an arf entry.
 							arf->entries[i].data = rrf->entries[scratch.tag].data;
 							arf->entries[i].busy = 0;
 						}
+
+					// not found => put peace
+
+				  }
+				  rob->scratch_queue.pop_front();
 				}
-				rob->scratch_queue.pop_front();
 			}
-			// not found => put peace
 		}
 
 		//display_arf();

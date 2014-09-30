@@ -3,8 +3,10 @@
 
 #include <deque>
 #include <iostream>
+#include "LSU.h"
 
 using namespace std;
+
 
 struct ROB_Entry{
 public:
@@ -21,6 +23,7 @@ public:
 class ROB{
 
   deque<ROB_Entry> entries;
+  LSU* lsu;
  
   /**
    * Scratch space to store the popped out entry
