@@ -38,7 +38,7 @@ void Tomasulo::fetch_instructions_to_cache()
 void Tomasulo::fetch_instructions_to_buffer()
 {
 	int i = 0;
-	while(instruction_buffer->size() < max_instruction_buffer_size && i < issue_size && instruction_cache->size() >0)
+	while(instruction_buffer->size() < max_instruction_buffer_size && i < issue_size && instruction_cache->size() > 0)
 	{
 		string instruction = instruction_cache->front();
 		instruction_cache->pop();
@@ -54,13 +54,15 @@ void Tomasulo::decode_instructions()
 	while(i < issue_size && instruction_buffer->size() > 0 && rs->size < rs->max_size && rob->get_size() < rob->max_size)
 	{
 		string instruction = instruction_buffer->front(); // fetch the first instruction from buffer.
-		// Now actually decode to get oopcode and perands
 
+		// Now actually decode to get opcode and operands
 		Decoded_Instruction *decoded_instruction = new Decoded_Instruction(instruction);
 
 		curr_instr ++;
+
 		/*cout << decoded_instruction->opcode<<" "<< decoded_instruction->ops[0].value << 
 		decoded_instruction->ops[1].value << decoded_instruction->ops[2].value<<  endl;*/
+
 		cout << "Decoding Instruction "<<instruction <<" "<<curr_instr <<endl;
 		operand dest = decoded_instruction->ops[0];
 		operand src1 = decoded_instruction->ops[1];
