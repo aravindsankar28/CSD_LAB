@@ -12,7 +12,7 @@ struct operand{
 public:
   int value;
   bool is_immediate;
-  
+  operand();
   operand(int value, bool is_immediate);
 };
 

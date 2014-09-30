@@ -13,6 +13,7 @@
 #include "Decoded_Instruction.h"
 #include "ROB.h"
 #include "ALU.h"
+#include "LSU.h"
 
 #define MAX_MEM 100
 #define NUM_INT_UNITS 2
@@ -60,7 +61,6 @@ class Tomasulo{
 
   queue<string> *instruction_cache; // has all instructions
 
-  queue<string>* fetchBuff;
   
   /**
    * Buffer between decode-I and decode-II
@@ -77,6 +77,7 @@ class Tomasulo{
   int Memory[MAX_MEM+1];
   int instruction_cycles[NUM_INSTRUCTION_TYPES];
   ALU *alu;
+  LSU *lsu;
   
 public:
   Tomasulo(int num_arch_reg, int num_renamed_reg,int num_rs_entries,int issue_size, ROB *rob,Res_Station *rs, ARF *arf, RRF *rrf);

@@ -62,8 +62,17 @@ void ROB::set_complete(int tag)
     }
   }
 
+}
 
-cout <<endl;
+void ROB::set_complete_ip(int instruction_number)
+{
+  for(int i = 0; i < this->entries.size(); i++){
+    
+    if(this->entries[i].instruction_number == instruction_number){
+      cout << "Setting exec to true for instruction "<< this->entries[i].instruction_number <<endl;
+      this->entries[i].exec = true;
+    }
+  }
 }
 
 int ROB::get_size()
