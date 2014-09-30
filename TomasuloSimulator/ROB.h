@@ -33,6 +33,7 @@ public:
    * @param max_size	:Size of the ROB
    */
   ROB_Entry scratch;
+  deque<ROB_Entry> scratch_queue;
   int max_size;
   ROB(int max_size);
  
