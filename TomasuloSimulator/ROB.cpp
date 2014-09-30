@@ -35,20 +35,25 @@ bool ROB::attempt_pop()
 
   if (this->entries.empty())
     return false;
-  
-  ROB_Entry re = this->entries.front();
-
-  if(re.exec){
-    cout << "Popping from rob to commit and retire instruction "<< re.instruction_number <<endl;
-    this->scratch = this->entries.front();
-    this->entries.pop_front();
-    //TODO: Need to inform RRF and ARF here.
     
+  ROB_Entry re = this->entries.front();
+  if(re.exec)
+  {
 
-    return true;
+      while(this->entries.size() >0 && re.exec ){
+        re = this->entries.front();
+        cout << "Popping from rob to commit and retire instruction "<< re.instruction_number <<endl;
+        //this->scratch = this->entries.front();
+        this->scratch_queue.push_back(this->entries.front());
+        this->entries.pop_front();
+        
+      }
+     
+      return true;
   }
   else
     return false;
+
 }
 
 void ROB::set_complete(int tag)

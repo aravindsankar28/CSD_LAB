@@ -218,7 +218,6 @@ void Tomasulo::simulate()
 
 	while(rob->get_size()>0 || instruction_buffer->size() >0 || instruction_cache->size() >0 )
 	{
-		
 		cout << "At start of Cycle "<< cycle << endl;
 		bool rob_popped = commit_instructions();
 		execute_instructions();
@@ -239,17 +238,23 @@ void Tomasulo::simulate()
 
 		if(rob_popped)
 		{
-			rrf->entries[rob->scratch.tag].busy = 0;
-			rrf->entries[rob->scratch.tag].valid = 0;
-			//cout << rob->scratch.tag <<endl;
-			for (int i = 0; i < arf->size; ++i)
+			while(rob->scratch_queue.size() > 0)
 			{
-				if(arf->entries[i].tag == rob->scratch.tag)
-					{
-						// found an arf entry.
-						arf->entries[i].data = rrf->entries[rob->scratch.tag].data;
-						arf->entries[i].busy = 0;
-					}
+				ROB_Entry scratch = rob->scratch_queue.front();
+				
+				rrf->entries[scratch.tag].busy = 0;
+				rrf->entries[scratch.tag].valid = 0;
+				//cout << rob->scratch.tag <<endl;
+				for (int i = 0; i < arf->size; ++i)
+				{
+					if(arf->entries[i].tag == scratch.tag)
+						{
+							// found an arf entry.
+							arf->entries[i].data = rrf->entries[scratch.tag].data;
+							arf->entries[i].busy = 0;
+						}
+				}
+				rob->scratch_queue.pop_front();
 			}
 			// not found => put peace
 		}
