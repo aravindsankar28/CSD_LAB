@@ -1,5 +1,5 @@
-all: main.o Tomasulo.o Decoded_Instruction.o ALU.o ROB.o ARF.o RRF.o ResStation.o
-	g++ -o run main.o Tomasulo.o Decoded_Instruction.o ALU.o ROB.o ARF.o RRF.o ResStation.o
+all: main.o Tomasulo.o Decoded_Instruction.o ALU.o ROB.o ARF.o RRF.o ResStation.o LSU.o
+	g++ -o run main.o Tomasulo.o Decoded_Instruction.o ALU.o ROB.o ARF.o RRF.o ResStation.o LSU.o
 main.o: main.cpp
 
 Tomasulo.o: Tomasulo.h Tomasulo.cpp
@@ -21,6 +21,8 @@ ARF.o: ARF.h ARF.cpp
 RRF.o: RRF.h RRF.cpp
 	g++ -c RRF.cpp -o RRF.o -fPIC
 
+LSU.o: LSU.h LSU.cpp
+	g++ -c LSU.cpp -o LSU.o -fPIC
 
 clean:	
 	rm *.o

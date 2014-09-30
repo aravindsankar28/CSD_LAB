@@ -57,6 +57,7 @@ public:
    * @param tag   : Instruction to be set to executed
    */
   void set_complete(int tag);
+  void set_complete_ip(int instruction_number);
   int get_size();
 };
 

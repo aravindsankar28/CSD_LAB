@@ -37,6 +37,10 @@ Decoded_Instruction::Decoded_Instruction(string s)
   }
 }
 
+operand::operand()
+{
+  
+}
 operand::operand(int value, bool is_immediate)
 {
   this->value = value;

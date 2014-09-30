@@ -2,7 +2,7 @@
 #include <fstream>
 #include <iostream>
 #include <string>
-#define FILE_NAME "program.txt"
+#define FILE_NAME "program1.txt"
 
 using namespace std;
 
@@ -22,6 +22,7 @@ Tomasulo::Tomasulo(int num_arch_reg, int num_renamed_reg, int num_rs_entries, in
     this->cycle = 0;
     this->curr_instr = 0;
     this->alu = new ALU[NUM_INT_UNITS];
+    this->lsu = new LSU(Memory,8);
 }
 
 void Tomasulo::fetch_instructions_to_cache()
@@ -51,8 +52,10 @@ void Tomasulo::fetch_instructions_to_buffer()
 void Tomasulo::decode_instructions()
 {
 	int i = 0;
+	
 	while(i < issue_size && instruction_buffer->size() > 0 && rs->size < rs->max_size && rob->get_size() < rob->max_size)
 	{
+		
 		string instruction = instruction_buffer->front(); // fetch the first instruction from buffer.
 
 		// Now actually decode to get opcode and operands
@@ -64,31 +67,48 @@ void Tomasulo::decode_instructions()
 		decoded_instruction->ops[1].value << decoded_instruction->ops[2].value<<  endl;*/
 
 		cout << "Decoding Instruction "<<instruction <<" "<<curr_instr <<endl;
-		operand dest = decoded_instruction->ops[0];
-		operand src1 = decoded_instruction->ops[1];
-		operand src2 = decoded_instruction->ops[2];
+		operand dest,src1,src2;
+		if(decoded_instruction->opcode != "STORE")
+		{	
+			dest = decoded_instruction->ops[0];
+			src1 = decoded_instruction->ops[1];
+			src2 = decoded_instruction->ops[2];
+		}
+		else
+		{
+			// case of STORE
+			src1 = decoded_instruction->ops[0];
+			src2 = decoded_instruction->ops[1];
+		}
 
-		// Now, check if an RRF entry can be assigned to the destination operand. If not, stop
-		int found_dest_reg =  rrf->find_non_busy_register();
-
-		if(found_dest_reg < 0)
-			break;
-		int dest_reg_rrf = found_dest_reg;
-		// doing destination allocate now. Not dest will always be a register
-
-		ARF_Entry arf_entry_dest = *(arf->get_entry(dest.value)); 
-		arf_entry_dest.busy = 1; // set busy bit in arf
-		arf_entry_dest.tag = dest_reg_rrf; // set tag as the offset in rrf
-		RRF_Entry rrf_entry_dest = *(rrf->get_entry(dest_reg_rrf));
-		rrf_entry_dest.valid = 0; // set valid bit of rrf entry = 0 
-		rrf_entry_dest.busy = 1; // set busy bit of rrf entry = 1
-
-		rrf->entries[dest_reg_rrf] = rrf_entry_dest;
-		arf->entries[dest.value] = arf_entry_dest;
-
+		cout << src1.is_immediate <<endl;
 		Res_Station_Entry* res_station_entry =  rs->get_free_entry();
 		res_station_entry->instruction_number = curr_instr;
-		res_station_entry->dest_tag = found_dest_reg; // set destination tag
+		// Now, check if an RRF entry can be assigned to the destination operand. If not, stop
+		// In case of a store, rrf entry need not be created for destination.
+		int found_dest_reg = 0;
+		
+		if(decoded_instruction->opcode != "STORE")
+		{
+			found_dest_reg =  rrf->find_non_busy_register();
+
+			if(found_dest_reg < 0)
+				break;
+
+			int dest_reg_rrf = found_dest_reg;
+			// doing destination allocate now. Not dest will always be a register
+
+			ARF_Entry arf_entry_dest = *(arf->get_entry(dest.value)); 
+			arf_entry_dest.busy = 1; // set busy bit in arf
+			arf_entry_dest.tag = dest_reg_rrf; // set tag as the offset in rrf
+			RRF_Entry rrf_entry_dest = *(rrf->get_entry(dest_reg_rrf));
+			rrf_entry_dest.valid = 0; // set valid bit of rrf entry = 0 
+			rrf_entry_dest.busy = 1; // set busy bit of rrf entry = 1
+
+			rrf->entries[dest_reg_rrf] = rrf_entry_dest;
+			arf->entries[dest.value] = arf_entry_dest;
+			res_station_entry->dest_tag = found_dest_reg; // set destination tag
+	}
 		// Source Read
 		// Now check src1 and src2 in the register files.
 		if ( ! src1.is_immediate )
@@ -127,9 +147,9 @@ void Tomasulo::decode_instructions()
 				res_station_entry->src1_data = src1.value;
 			}
 
-
+			// IF LOAD, then src2 does not exist
 		// Source read for src2
-		if ( ! src2.is_immediate )
+		if ( ! src2.is_immediate && decoded_instruction->opcode != "LOAD")
 		{
 			
 			// If ARF entry is not busy
@@ -161,7 +181,7 @@ void Tomasulo::decode_instructions()
 				}
 			}
 		}
-		else
+		else if(decoded_instruction->opcode != "LOAD")
 			{
 				// operand is immediate
 				res_station_entry->src2_data_present = 1;
@@ -198,8 +218,9 @@ void Tomasulo::simulate()
 	// For now 
 	fetch_instructions_to_cache();
 
-	while(rob->get_size()>0 || instruction_cache->size() >0)
+	while(rob->get_size()>0 || instruction_buffer->size() >0 || instruction_cache->size() >0 )
 	{
+		
 		cout << "At start of Cycle "<< cycle << endl;
 		bool rob_popped = commit_instructions();
 		execute_instructions();
@@ -213,6 +234,10 @@ void Tomasulo::simulate()
 			alu[i].commit();
 		}
 
+
+		lsu->try_pop_from_store_queue();
+
+		lsu->commit();
 
 		if(rob_popped)
 		{
@@ -230,6 +255,7 @@ void Tomasulo::simulate()
 			}
 			// not found => put peace
 		}
+
 		//display_arf();
 		//display_rrf();
 		//display_rs();
@@ -266,8 +292,8 @@ void Tomasulo::execute_instructions()
 					rs_entry->src1_data = rrf->get_entry(tag)->data;
 				}
 			}
-
-			if(! rs_entry->src2_data_present)
+			// src 2's tag can be < 0 in case of a load
+			if(! rs_entry->src2_data_present && rs_entry->src2_tag > 0)
 			{
 				int tag = rs_entry->src2_tag;
 				if(rrf->get_entry(tag)->valid)
@@ -307,18 +333,136 @@ void Tomasulo::execute_instructions()
 					}
 				}
 			}
-			else
-			{
-				// to handle later 
-			}
+			
 		}
 	}
+	// Handling loads and stores seperately
+
+	// First, find a load which has least ip and is ready.
+	int min_i = 0;
+	int min_instruction_number = -1;
+	bool any_load_found = false;
+
+	for (int i = 0; i < rs->max_size ; ++i)
+	{
+		Res_Station_Entry* rs_entry = rs->get_entry(i);
+		if (rs_entry->busy && rs_entry->opcode == "LOAD" && rs_entry->src1_data_present)
+		{
+			// this entry is a load and is ready. 
+			if(min_instruction_number < 0 || rs_entry->instruction_number < min_instruction_number )
+				{
+					min_i = i;
+					min_instruction_number = rs_entry->instruction_number;
+				}
+
+		}
+		else if(rs_entry->busy && rs_entry->opcode == "LOAD")
+			any_load_found = true;
+
+	}
+	// Now found the first ready load in program order -- Now check that there are no other stores in prog. order b4 it that 
+	// could a possible alias. If stores exist , stall.
+	if(min_instruction_number >= 0 )
+	{
+		// which means we found some load that is ready.
+		// Now search for any stores to see if we can have any conflicts.
+		bool is_conflicting = false;
+		for (int i = 0; i < rs->max_size; ++i)
+		{
+			Res_Station_Entry* rs_entry = rs->get_entry(i);
+			// look for a store b4 it in program order
+			if (rs_entry->busy && rs_entry->opcode == "STORE" && rs_entry->instruction_number < min_instruction_number)
+			{
+				if((rs_entry->src1_data_present && rs_entry->src1_data == rs->get_entry(min_i)->src1_data) || ! rs_entry->src1_data_present)
+					{
+						is_conflicting = true;
+						break;
+						// there exists a conflicting store - so stall
+					}
+			}
+		}
+
+		if(! is_conflicting)
+		{
+			// We have a ready load , and no stores before it that can possibly conflict.
+			// So issue it !! Not so fast dude !
+			// Check if load forwarding is possible. 
+			// If not, check if LSU is busy
+
+			bool flag = lsu->is_forwarding_possible(rs->get_entry(min_i)->src1_data);
+			if(flag)
+			{
+				rs->remove_entry(rs->get_entry(min_i));
+				// do load forwarding even if lsu is busy
+				lsu->issue_instruction(rs->get_entry(min_i)->instruction_number, this->opcode_helper(rs->get_entry(min_i)->opcode),
+					rs->get_entry(min_i)->src1_data,rs->get_entry(min_i)->src2_data,rs->get_entry(min_i)->dest_tag,rob,rrf,true);
+
+			}
+			else if(! lsu->is_busy)
+			{
+
+				lsu->issue_instruction(rs->get_entry(min_i)->instruction_number, this->opcode_helper(rs->get_entry(min_i)->opcode),
+					rs->get_entry(min_i)->src1_data,rs->get_entry(min_i)->src2_data,rs->get_entry(min_i)->dest_tag,rob,rrf,false);
+
+				rs->remove_entry(rs->get_entry(min_i));
+				// lsu not busy
+			}
+			else
+			{
+				// lsu busy -- nothing to do -- put peace and stall.
+
+			}
+
+		}
+
+	}
+	else if(any_load_found)
+	{
+		// which means no load was found that was ready. 
+		// in such a case put peace and stall
+	}
+	else
+	{
+		// No loads found, so check for stores.
+		// Find first ready store according to program order.
+		int min_store_i = -1;
+		int min_store_instruction_number = -1;
+		for (int i = 0; i < rs->max_size ; ++i)
+		{
+			Res_Station_Entry* rs_entry = rs->get_entry(i);
+			if (rs_entry->busy && rs_entry->opcode == "STORE" && rs_entry->src1_data_present && rs_entry->src2_data_present)
+			{
+				
+				if(min_store_instruction_number < 0 || rs_entry->instruction_number < min_store_instruction_number )
+					{
+						min_store_i = i;
+						min_store_instruction_number = rs_entry->instruction_number;
+					}
+			}
+
+		}
+		if (min_store_instruction_number >= 0 && lsu->store_queue.size() < lsu->store_queue_max_size)
+		{
+			
+			// Assuming only one store can be removed from res. station and we've found a store.
+			lsu->issue_instruction(rs->get_entry(min_store_i)->instruction_number, this->opcode_helper(rs->get_entry(min_store_i)->opcode),
+					rs->get_entry(min_store_i)->src1_data,rs->get_entry(min_store_i)->src2_data,rs->get_entry(min_store_i)->dest_tag,rob,rrf,false);
+
+			rs->remove_entry(rs->get_entry(min_store_i));
+		}
+
+
+
+	}
+
 	// Instruction issuing to ALU's completed.
 	// Now call ALU to run
 	for (int i = 0; i < NUM_INT_UNITS; ++i)
 	{
 		alu[i].run();
 	}
+	// LSU run
+	lsu->run();
 
 }
 

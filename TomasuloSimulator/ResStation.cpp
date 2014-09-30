@@ -6,6 +6,7 @@ using namespace std;
 
  Res_Station_Entry::Res_Station_Entry()
   {
+  	this->dest_tag = -1;
     this->src1_tag =-1;
     this->src2_tag = -1;
     this->src1_data_present = 0;
