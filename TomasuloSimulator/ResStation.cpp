@@ -39,7 +39,7 @@ Res_Station_Entry* Res_Station::get_free_entry()
 void Res_Station::display()
 {
 	cout << "RESERVATION STATION :"<<endl;
-	cout << "opcode" <<"\t"<<"dest_t"<<"\t"<<"src1" <<"\t"<<"src1_p"<< "\t"<<"src2"<<"\t"<<"src2_p"<<"\t"<<endl;
+	cout << "opcode" <<"\t"<<"dest_t"<<"\t"<<"src1" <<"\t"<<"src1_t"<<"\t"<<"src1_p"<< "\t"<<"src2"<<"\t"<<"src2_p"<<"\t"<<endl;
 	for (int i = 0; i < max_size; ++i)
 	{
 		if(this->entries[i].busy)
@@ -51,7 +51,7 @@ void Res_Station::display()
 }
 void Res_Station_Entry::display()
 {
-	cout << opcode <<"\t("<<dest_tag << ")\t" <<src1_data <<"\t"<<src1_data_present<<"\t"<<src2_data <<"\t"<<src2_data_present<<"\t"<< endl;
+	cout << opcode <<"\t("<<dest_tag << ")\t" <<src1_data <<"\t"<<src1_tag<<"\t" <<src1_data_present<<"\t"<<src2_data <<"\t"<<src2_data_present<<"\t"<< endl;
 }
 Res_Station_Entry* Res_Station::get_entry(int index)
 {

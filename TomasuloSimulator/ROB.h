@@ -12,17 +12,20 @@ struct ROB_Entry{
 public:
   int tag;
   bool exec;
+  string opcode;
   int instruction_number;
+  int src1;
+  int src2;
+  int dest;
 
-
-  ROB_Entry(int tag, bool exec);
+  ROB_Entry(int tag, bool exec, string opcode);
   ROB_Entry();
+  void print();
 };
 
 
 class ROB{
 
-  deque<ROB_Entry> entries;
   LSU* lsu;
  
   /**
@@ -30,6 +33,7 @@ class ROB{
    */
   
 public:
+  deque<ROB_Entry> entries;
   
   /**
    * Constructor.
@@ -61,8 +65,9 @@ public:
    * @param tag   : Instruction to be set to executed
    */
   void set_complete(int tag);
-  void set_complete_ip(int instruction_number);
+  void set_complete_store(int instruction_number);
   int get_size();
+  void print();
 };
 
 #endif

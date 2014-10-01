@@ -79,6 +79,8 @@ class Tomasulo{
   ALU *alu;
   LSU *lsu;
   
+  
+  
 public:
   Tomasulo(int num_arch_reg, int num_renamed_reg,int num_rs_entries,int issue_size, ROB *rob,Res_Station *rs, ARF *arf, RRF *rrf);
   
@@ -110,6 +112,8 @@ public:
 
   void initialize_memory();
 
+  int store_index;
+  
   void initialize_instruction_cycles();
 
 };

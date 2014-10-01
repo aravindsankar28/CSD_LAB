@@ -58,6 +58,15 @@ class LSU{
   int instruction_number_mem;
   bool commited_mem;
 
+  int reqd_cycles_for;
+  int curr_cycle_for;  
+  int opcode_for;
+  int src1_for; // value
+  int src2_for; // value
+  int dest_for; // rrf tag
+  int scratch_for;
+  int instruction_number_for;
+  bool commited_for;
 
 
   ROB* rob;
@@ -66,7 +75,7 @@ class LSU{
   bool is_forwarding;
   bool is_store_adding_in_progress;
 
-
+ 
   int calculate();
   
 public:
@@ -77,7 +86,7 @@ public:
   deque<Store_Queue_Entry> store_queue;
 
   void issue_instruction(int instruction_number,int opcode, int src1, int src2, int dest, ROB* rob, RRF* rrf, bool is_forwarding);
- 
+  int rob_position_recent_store;
 
   bool is_forwarding_possible(int memory_address);
   int find_val(int memory_address);
@@ -100,6 +109,7 @@ public:
     this->is_busy = false;
     this->commited_mem = false;
     this->store_queue_max_size = store_queue_max_size;
+    rob_position_recent_store = -1;
   }
 };
 

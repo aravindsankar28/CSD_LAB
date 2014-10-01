@@ -1,4 +1,4 @@
-all: main.o Tomasulo.o Decoded_Instruction.o ALU.o ROB.o ARF.o RRF.o ResStation.o LSU.o
+all: clean main.o Tomasulo.o Decoded_Instruction.o ALU.o ROB.o ARF.o RRF.o ResStation.o LSU.o
 	g++ -o run main.o Tomasulo.o Decoded_Instruction.o ALU.o ROB.o ARF.o RRF.o ResStation.o LSU.o
 main.o: main.cpp
 
