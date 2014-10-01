@@ -38,7 +38,7 @@ public:
   void issue_instruction(int instruction_number,int opcode, int src1, int src2, int dest, ROB* rob, RRF* rrf);
   
   /**
-   * Commit result of instruction to ROB/RRF
+   * Commit result of instruction to ROB and RRF
    */
   void commit();
   

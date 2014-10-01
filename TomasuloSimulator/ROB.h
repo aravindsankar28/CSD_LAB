@@ -16,9 +16,9 @@ public:
   int instruction_number;
   int src1;
   int src2;
-  int dest;
+  
 
-  ROB_Entry(int tag, bool exec, string opcode);
+  ROB_Entry(int tag,string opcode);
   ROB_Entry();
   void print();
 };

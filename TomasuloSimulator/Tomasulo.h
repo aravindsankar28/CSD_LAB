@@ -22,18 +22,12 @@
 using namespace std;
 
 
-
-/**
- * Modelled the registers as 64-bit integers
- */
-//typedef reg uint64_t;
-
 class Tomasulo{
 
   int curr_instr;
   /**
-   * This must be equal to number of entries in ARF
-   */
+  * This must be equal to number of entries in ARF
+  */
   int num_arch_reg;
 
   /**
@@ -47,67 +41,56 @@ class Tomasulo{
   int num_rs_entries;
 
   /**
-   * Number of instructions fetched per cycle.
-   */
+  * Number of instructions fetched per cycle.
+  */
   int issue_size;
   
   int cycle;
 
   int max_instruction_buffer_size ;
-  /*Fetched instructions are kept here at the end of FETCH STAGE */ 
-
-  queue<string> *instruction_buffer;
-
-
-  queue<string> *instruction_cache; // has all instructions
-
   
-  /**
-   * Buffer between decode-I and decode-II
-   */
-  //queue<Decoded_Instruction> decodeBuff;
-  
-  /**
-   * Elements of the algorithm
-   */  
+  queue<string> *instruction_buffer; /*Fetched instructions are kept here at the end of FETCH STAGE */
+
+
+  queue<string> *instruction_cache; /* Has all instructions of the program */
+
+    
   ARF *arf;
   RRF *rrf;
   Res_Station *rs;
   ROB *rob;
   int Memory[MAX_MEM+1];
-  int instruction_cycles[NUM_INSTRUCTION_TYPES];
+  int instruction_cycles[NUM_INSTRUCTION_TYPES]; // has latencies for each instruction.
   ALU *alu;
   LSU *lsu;
-  
-  
   
 public:
   Tomasulo(int num_arch_reg, int num_renamed_reg,int num_rs_entries,int issue_size, ROB *rob,Res_Station *rs, ARF *arf, RRF *rrf);
   
 
-  // done only once
-  void fetch_instructions_to_cache();
   
-  // done at fetch stage
-  void fetch_instructions_to_buffer();
+  void fetch_instructions_to_cache(); /* Done only once at the start of the program */
   
-  void decode_instructions();
+  
+  void fetch_instructions_to_buffer(); /* Done at fetch stage */
+  
+  void decode_instructions(); /* Done at decode stage */
 
-  void execute_instructions();
+  void execute_instructions(); /* Done at execute stage */
 
-  bool commit_instructions();
+  bool commit_instructions(); /* Done at commit/retire stage */
 
-  void simulate();
+  void simulate(); /* Called to sstart the simluation */
 
-  void display_arf();
+  void display_arf(); /* Helper to display arf register file */
 
-  void display_rrf();
+  void display_rrf(); /* Helper to display rrf register file */
 
-  void display_rs();
+  void display_rs(); /* Helper to display contents of reservation station */
 
-  int opcode_helper(string opcode);
+  int opcode_helper(string opcode); /* Returns opcode no. on input of opcode string */
 
-  // Needs to be done before the simulation starts - TODO
+  // Needs to be done before the simulation starts 
   void initialize_register_file(); 
 
   void initialize_memory();
@@ -123,7 +106,7 @@ public:
   */
   int get_cycles(int opcode);
 
- 
+
 
 
 

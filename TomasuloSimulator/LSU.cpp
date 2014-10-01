@@ -90,7 +90,7 @@ void LSU::issue_instruction(int instruction_number,int opcode, int src1, int src
       this->is_busy = true;
       this->instruction_number_mem = instruction_number;
       this->opcode_mem = opcode;
-      this->reqd_cycles_mem = 4; // For now set load latency as 4.
+      this->reqd_cycles_mem = this->instruction_cycles[opcode]; // For now set load latency as 4.
       this->curr_cycle_mem = 0;
       this->commited_mem = false;
       this->src1_mem = src1;
@@ -186,7 +186,7 @@ void LSU::run()
       store_queue_entry->memory_address = this->src1;
       cout << "sqe mem address" << this->src1 <<endl;
       store_queue_entry->instruction_number = this->instruction_number;
-      store_queue_entry->latency_timer = 5; // for now 
+      store_queue_entry->latency_timer = this->instruction_cycles[this->opcode]; // for now 
       store_queue.push_back(*store_queue_entry);
       this->is_store_adding_in_progress = false;
       this->commited = true;

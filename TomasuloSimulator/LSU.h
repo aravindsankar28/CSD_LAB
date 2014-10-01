@@ -36,6 +36,8 @@ public:
 
 class LSU{
 
+
+/* REGISTERS FOR STORE INSTRUCTION */
   int reqd_cycles;
   int curr_cycle;  
   int opcode;
@@ -48,6 +50,8 @@ class LSU{
 
 
 
+/* REGISTERS FOR LOAD MEM INSTRUCTION */
+
   int reqd_cycles_mem;
   int curr_cycle_mem;  
   int opcode_mem;
@@ -58,6 +62,8 @@ class LSU{
   int instruction_number_mem;
   bool commited_mem;
 
+
+/* REGISTERS FOR LOAD FORWARDED INSTRUCTION */
   int reqd_cycles_for;
   int curr_cycle_for;  
   int opcode_for;
