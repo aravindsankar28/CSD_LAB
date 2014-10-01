@@ -24,6 +24,9 @@
       this->curr_instr = 0;
       this->alu = new ALU[NUM_INT_UNITS];
       this->lsu = new LSU(Memory,8);
+      this->alu->instruction_cycles = this->instruction_cycles;
+      this->lsu->instruction_cycles = this->instruction_cycles;
+    
   }
 
   void Tomasulo::fetch_instructions_to_cache()

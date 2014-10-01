@@ -82,7 +82,7 @@ public:
 
   bool is_busy;
   int store_queue_max_size;
-
+  int* instruction_cycles;
   deque<Store_Queue_Entry> store_queue;
 
   void issue_instruction(int instruction_number,int opcode, int src1, int src2, int dest, ROB* rob, RRF* rrf, bool is_forwarding);

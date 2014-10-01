@@ -33,7 +33,7 @@ class ALU{
   int calculate();
   
 public:
-
+  int* instruction_cycles;
   bool is_busy;
   void issue_instruction(int instruction_number,int opcode, int src1, int src2, int dest, ROB* rob, RRF* rrf);
   
