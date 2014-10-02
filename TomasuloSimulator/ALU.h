@@ -30,6 +30,7 @@ class ALU{
   ROB* rob;
   RRF* rrf;
   bool commited;
+  bool debug;
   int calculate();
   
 public:
@@ -48,10 +49,12 @@ public:
    */
   void run();
 
-  ALU()
+  ALU(bool debug)
   {
     commited = false;
+    this->debug = debug;
   }
 };
   
+ 
 #endif

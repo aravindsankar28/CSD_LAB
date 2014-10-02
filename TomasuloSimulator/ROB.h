@@ -16,7 +16,7 @@ public:
   int instruction_number;
   int src1;
   int src2;
-  
+  bool debug;
 
   ROB_Entry(int tag,string opcode);
   ROB_Entry();
@@ -27,7 +27,7 @@ public:
 class ROB{
 
   LSU* lsu;
- 
+  bool debug;
   /**
    * Scratch space to store the popped out entry
    */
@@ -42,7 +42,7 @@ public:
   ROB_Entry scratch;
   deque<ROB_Entry> scratch_queue;
   int max_size;
-  ROB(int max_size);
+  ROB(int max_size, bool debug);
  
   /**
    * Try to push the ROB entry to back of the queue.

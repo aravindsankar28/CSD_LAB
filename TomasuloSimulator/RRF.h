@@ -1,7 +1,6 @@
 #ifndef RRF_H
 #define RRF_H
 
-
 #include <stdint.h>
 #include <iostream>
 
@@ -23,13 +22,15 @@ struct RRF_Entry{
 };
 
 class RRF{
+  bool debug;
   int size;
 public:
   RRF_Entry *entries;
-  RRF(int size);
+  RRF(int size, bool debug);
   int find_non_busy_register();
   RRF_Entry* get_entry(int index);
   void display();
 };
 
+ 
 #endif

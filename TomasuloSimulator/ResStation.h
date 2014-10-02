@@ -1,6 +1,5 @@
 #ifndef RES_STATION_H
 #define RES_STATION_H
-
 #include <stdint.h>
 #include <string>
 /**
@@ -43,15 +42,18 @@ public:
 
 class Res_Station{
   
-  Res_Station_Entry *entries;
+
 public:
+  Res_Station_Entry *entries;
   int size;
   int max_size;
-  Res_Station(int max_size);
+  Res_Station(int max_size, bool debug);
   Res_Station_Entry* get_free_entry();
   Res_Station_Entry* get_entry(int index);
   void display();
   void remove_entry(Res_Station_Entry* res_station_entry);
+  bool debug;
 };
 
 #endif
+ 

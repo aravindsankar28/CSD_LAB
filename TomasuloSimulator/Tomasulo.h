@@ -1,6 +1,5 @@
 #ifndef TOMASULO_H
 #define TOMASULO_H
-
 #include <stdint.h>
 #include <string>
 #include <queue>
@@ -20,7 +19,6 @@
 #define NUM_INSTRUCTION_TYPES 9
 
 using namespace std;
-
 
 class Tomasulo{
 
@@ -46,6 +44,8 @@ class Tomasulo{
   int issue_size;
   
   int cycle;
+  
+  bool debug;
 
   int max_instruction_buffer_size ;
   
@@ -65,9 +65,7 @@ class Tomasulo{
   LSU *lsu;
   
 public:
-  Tomasulo(int num_arch_reg, int num_renamed_reg,int num_rs_entries,int issue_size, ROB *rob,Res_Station *rs, ARF *arf, RRF *rrf);
-  
-
+  Tomasulo(int num_arch_reg, int num_renamed_reg,int num_rs_entries,int issue_size, ROB *rob,Res_Station *rs, ARF *arf, RRF *rrf, bool debug);
   
   void fetch_instructions_to_cache(); /* Done only once at the start of the program */
   
@@ -98,16 +96,11 @@ public:
   int store_index;
   
   void initialize_instruction_cycles();
+  
+  void print_memory();
+  
+  void print_memory(int index);
 
 };
-
-  /**
-  * Get number of cycles reqd fr execution of opcode.
-  */
-  int get_cycles(int opcode);
-
-
-
-
 
 #endif

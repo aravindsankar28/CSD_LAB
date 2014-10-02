@@ -1,5 +1,4 @@
 #include "ALU.h"
-
 #include "Tomasulo.h"
 #include <stdint.h>
 
@@ -16,7 +15,10 @@ void ALU::issue_instruction(int instruction_number,int opcode, int src1, int src
   this->dest = dest;
   this->rob = rob;
   this->rrf = rrf;
-  cout << "Instruction " << this->instruction_number << " issued on ALU "<<endl;
+
+  if(this->debug){
+    cout << "Instruction " << this->instruction_number << " issued on ALU "<<endl;
+  }
 }
 
 void ALU::commit()
@@ -31,8 +33,8 @@ void ALU::commit()
       this->commited = false;
       rrf_entry->valid = true;
       rrf_entry->data = this->scratch;  
+     if(this->debug)
       cout << "ALU Commit done of instruction "<< this->instruction_number<<endl;
-      
     }
 }
 
@@ -42,7 +44,8 @@ void ALU::run()
   if(this->is_busy && this->curr_cycle == this->reqd_cycles){
     this->scratch = this->calculate();
     this->commited = true;
-    cout << "Finished calculation of instruction "<<this->instruction_number<<endl;
+    if(this->debug)
+      cout << "Finished calculation of instruction "<<this->instruction_number<<endl;
   }
 }
 

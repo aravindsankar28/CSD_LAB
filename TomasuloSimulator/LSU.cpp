@@ -16,7 +16,7 @@ void LSU::try_pop_from_store_queue()
     return;
   if( !this->is_busy || head->latency_timer < 5 )
   {
-    
+if(this->debug)  {
      if(head->latency_timer == 5)
       cout << "Starting to pop from store queue" <<endl;
 
@@ -24,6 +24,7 @@ void LSU::try_pop_from_store_queue()
         {
           cout << "ERROR" << endl;
         }
+}
       this->is_busy = true;
       if(head->latency_timer >0)
         head->latency_timer --;
@@ -31,7 +32,9 @@ void LSU::try_pop_from_store_queue()
       if(head->latency_timer == 0)
       {
         store_queue.pop_front();
+if(this->debug)  
         cout << "Poppping from store queue "<<endl;
+ 
 	this->mem[head->memory_address] = head->data_to_store;
         this->is_busy = false;
       }
@@ -44,9 +47,10 @@ bool LSU::is_forwarding_possible(int memory_address)
 {
   for (int i = 0; i < store_queue.size(); ++i)
   {
-    cout << i << "  "<< store_queue.size()<<endl;
     Store_Queue_Entry sqe = store_queue[i];
-    cout <<"Mem address " << memory_address <<" sqe " <<sqe.memory_address<<endl;
+    if(this->debug)  
+      cout <<"Mem address " << memory_address <<" sqe " <<sqe.memory_address<<endl;
+ 
     if(memory_address == sqe.memory_address)
       return true;
   }
@@ -66,8 +70,9 @@ void LSU::issue_instruction(int instruction_number,int opcode, int src1, int src
     this->src1 = src1;
     this->src2 = src2;
     this->dest = dest;   
-    cout << "instruction " << this->instruction_number << " issued on LSU "<<endl;
-
+if(this->debug)  
+    cout << "Instruction " << this->instruction_number << " issued on LSU "<<endl;
+ 
   }
   else if(opcode == LOAD && is_forwarding)
   {
@@ -81,8 +86,9 @@ void LSU::issue_instruction(int instruction_number,int opcode, int src1, int src
       this->src2_for = src2;
       this->dest_for = dest;
       this->is_forwarding = is_forwarding;
+if(this->debug)  
       cout << "Instruction " << this->instruction_number_for << " issued on LSU for forwarding "<<endl;
-
+ 
   }
   else if(opcode == LOAD) 
   {
@@ -96,9 +102,9 @@ void LSU::issue_instruction(int instruction_number,int opcode, int src1, int src
       this->src1_mem = src1;
       this->src2_mem = src2;
       this->dest_mem = dest;
-
-      cout << "instruction " << this->instruction_number_mem << " issued on LSU "<<endl;
-
+if(this->debug)  
+      cout << "Instruction " << this->instruction_number_mem << " issued on LSU "<<endl;
+ 
 
   }
 
@@ -125,8 +131,9 @@ void LSU::commit()
       rrf_entry->valid = true;
 
       rrf_entry->data = this->scratch_mem;  
+if(this->debug)  
       cout << "LSU Commit done of instruction "<< this->instruction_number_mem<<endl;
-      
+ 
     }
 
     if(this->commited_for && this->opcode_for == LOAD)
@@ -143,23 +150,27 @@ void LSU::commit()
       rrf_entry->valid = true;
 
       rrf_entry->data = this->scratch_for;  
+if(this->debug)  
       cout << "1 : LSU Commit done of instruction "<< this->instruction_number_for<<endl;
-
+ 
       
     }
     if(this->commited && this->opcode == STORE)
     {
         this->rob->set_complete_store(this->dest);
-        cout << "2 : LSU Commit done of instruction "<< this->instruction_number<<endl;
+if(this->debug)  
+	cout << "2 : LSU Commit done of instruction "<< this->instruction_number<<endl;
+ 
 	this->commited = false;
     }
-    cout << endl;
+    if(this->debug)
+      cout << endl;
 
 
 }
 int LSU::find_val(int memory_address)
 {
-  for (int i = 0; i < store_queue.size(); ++i)
+  for (int i = store_queue.size()-1; i >= 0 ; i--)
   {
     Store_Queue_Entry sqe = store_queue[i];
     if(memory_address == sqe.memory_address)
@@ -184,13 +195,15 @@ void LSU::run()
       Store_Queue_Entry* store_queue_entry = new Store_Queue_Entry();
       store_queue_entry->data_to_store = this->src2;
       store_queue_entry->memory_address = this->src1;
-      cout << "sqe mem address" << this->src1 <<endl;
+      store_queue_entry->tag = this->dest;
       store_queue_entry->instruction_number = this->instruction_number;
       store_queue_entry->latency_timer = this->instruction_cycles[this->opcode]; // for now 
       store_queue.push_back(*store_queue_entry);
       this->is_store_adding_in_progress = false;
       this->commited = true;
+if(this->debug)  
        cout << "Finished execution of instruction "<<this->instruction_number<< " by pushing to store queue "<<endl;
+ 
     }
 
    if(this->opcode_for == LOAD && this->curr_cycle_for == this->reqd_cycles_for && this->is_forwarding)
@@ -201,21 +214,20 @@ void LSU::run()
           this->scratch_for = find_val(this->src1);
           this->is_forwarding = false;
           this->commited_for = true;
+if(this->debug)  
           cout << "Finished execution of instruction "<<this->instruction_number_for<< " by load forwarding"<<endl;
-        }
-        else
-        {
-          cout << "STUPID - if forwarding not possible why come here :( ";
+ 
         }
     }
        
       if(this->opcode_mem == LOAD && this->is_busy && this->curr_cycle_mem == this->reqd_cycles_mem)
       {
-	cout << "loading "<<endl;
           // fetch from memory
           this->scratch_mem = this->mem[this->src1_mem];
           this->commited_mem = true;
-          cout << "Finished execution of instruction "<<this->instruction_number_mem<< " by accessing cache"<<endl;
+if(this->debug)  
+	  cout << "Finished execution of instruction "<<this->instruction_number_mem<< " by accessing cache"<<endl;
+ 
       }
     
    

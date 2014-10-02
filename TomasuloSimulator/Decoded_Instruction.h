@@ -25,4 +25,4 @@ public:
   Decoded_Instruction(string s);
 };
 
-#endif
+ #endif

@@ -22,16 +22,15 @@ struct ARF_Entry{
 };
 
 class ARF{
- 
- 
-  
+ bool debug;
 public:
   int size;
   ARF_Entry *entries;
   ARF_Entry* get_entry(int index);
-  ARF(int size);
+  ARF(int size, bool debug);
   void display();
   //All member functions here
 };
 
+ 
 #endif

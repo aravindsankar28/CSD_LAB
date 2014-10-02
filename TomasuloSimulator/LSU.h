@@ -22,6 +22,8 @@ public:
   int latency_timer;
   
   bool completed;
+  
+  int tag;
 
   Store_Queue_Entry()
   {
@@ -48,7 +50,7 @@ class LSU{
   int instruction_number;
   bool commited;
 
-
+  bool debug;
 
 /* REGISTERS FOR LOAD MEM INSTRUCTION */
 
@@ -106,7 +108,7 @@ public:
   void run();
 
   void try_pop_from_store_queue();
-  LSU(int *mem,int store_queue_max_size)
+  LSU(int *mem,int store_queue_max_size, bool debug)
   {
     this->commited = false;
     this->mem = mem;
@@ -119,5 +121,6 @@ public:
   }
 };
 
-  
 #endif
+  
+ 
