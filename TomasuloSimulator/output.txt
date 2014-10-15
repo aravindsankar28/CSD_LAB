@@ -1,0 +1,187 @@
+Hello, world!
+Start of cycle 1
+RESERVATION STATION :
+opcode	dest_t	src1	src1_t	src1_p	src2	src2_p	
+HERE!!
+Fetching instruction STORE 5 10
+Fetching instruction LOAD R1 5
+ROB :
+
+
+Start of cycle 2
+RESERVATION STATION :
+opcode	dest_t	src1	src1_t	src1_p	src2	src2_p	
+HERE!!
+Decoding Instruction STORE 5 10 1
+Pushing to rob instruction 1
+Decoding Instruction LOAD R1 5 2
+Pushing to rob instruction 2
+Fetching instruction LOAD R5 R1
+Fetching instruction STORE R1 5
+ROB :
+Tag :0 : IP :1 : Exec :0
+Tag :0 : IP :2 : Exec :0
+
+
+Start of cycle 3
+RESERVATION STATION :
+opcode	dest_t	src1	src1_t	src1_p	src2	src2_p	
+STORE	(0)	5	-1	1	10	1	
+LOAD	(0)	5	-1	1	-1	0	
+instruction 1 issued on LSU 
+HERE!!
+sqe mem address5
+Finished execution of instruction 1 by pushing to store queue 
+Decoding Instruction LOAD R5 R1 3
+Pushing to rob instruction 3
+Decoding Instruction STORE R1 5 4
+Pushing to rob instruction 4
+ROB :
+Tag :0 : IP :1 : Exec :0
+Tag :0 : IP :2 : Exec :0
+Tag :1 : IP :3 : Exec :0
+Tag :1 : IP :4 : Exec :0
+
+input tag 0 0
+Setting exec to true for instruction 1
+input tag 0 0
+input tag 0 1
+input tag 0 1
+2 : LSU Commit done of instruction 1
+
+Start of cycle 4
+Popping from rob to commit and retire instruction 1
+RESERVATION STATION :
+opcode	dest_t	src1	src1_t	src1_p	src2	src2_p	
+LOAD	(1)	5	0	0	10	0	
+LOAD	(0)	5	-1	1	-1	0	
+STORE	(1)	-1	0	0	5	1	
+0  1
+Mem address 5 sqe 5
+Instruction 2 issued on LSU for forwarding 
+HERE!!
+0  1
+Mem address 5 sqe 5
+Finished execution of instruction 2 by load forwarding
+ROB :
+Tag :0 : IP :2 : Exec :0
+Tag :1 : IP :3 : Exec :0
+Tag :1 : IP :4 : Exec :0
+
+Setting exec to true for instruction 2
+1 : LSU Commit done of instruction 2
+
+Start of cycle 5
+Popping from rob to commit and retire instruction 2
+RESERVATION STATION :
+opcode	dest_t	src1	src1_t	src1_p	src2	src2_p	
+LOAD	(1)	10	0	1	10	0	
+STORE	(1)	10	0	1	5	1	
+0  1
+Mem address 10 sqe 5
+instruction 3 issued on LSU 
+HERE!!
+ROB :
+Tag :1 : IP :3 : Exec :0
+Tag :1 : IP :4 : Exec :0
+
+
+Start of cycle 6
+RESERVATION STATION :
+opcode	dest_t	src1	src1_t	src1_p	src2	src2_p	
+STORE	(1)	10	0	1	5	1	
+HERE!!
+loading 
+Finished execution of instruction 3 by accessing cache
+ROB :
+Tag :1 : IP :3 : Exec :0
+Tag :1 : IP :4 : Exec :0
+
+Setting exec to true for instruction 3
+LSU Commit done of instruction 3
+
+Start of cycle 7
+Popping from rob to commit and retire instruction 3
+RESERVATION STATION :
+opcode	dest_t	src1	src1_t	src1_p	src2	src2_p	
+STORE	(1)	10	0	1	5	1	
+instruction 4 issued on LSU 
+HERE!!
+sqe mem address10
+Finished execution of instruction 4 by pushing to store queue 
+ROB :
+Tag :1 : IP :4 : Exec :0
+
+Starting to pop from store queue
+input tag 1 1
+Setting exec to true for instruction 4
+2 : LSU Commit done of instruction 4
+
+Start of cycle 8
+Popping from rob to commit and retire instruction 4
+RESERVATION STATION :
+opcode	dest_t	src1	src1_t	src1_p	src2	src2_p	
+HERE!!
+ROB :
+
+
+Start of cycle 9
+RESERVATION STATION :
+opcode	dest_t	src1	src1_t	src1_p	src2	src2_p	
+HERE!!
+ROB :
+
+
+Start of cycle 10
+RESERVATION STATION :
+opcode	dest_t	src1	src1_t	src1_p	src2	src2_p	
+HERE!!
+ROB :
+
+
+Start of cycle 11
+RESERVATION STATION :
+opcode	dest_t	src1	src1_t	src1_p	src2	src2_p	
+HERE!!
+ROB :
+
+Poppping from store queue 
+
+Start of cycle 12
+RESERVATION STATION :
+opcode	dest_t	src1	src1_t	src1_p	src2	src2_p	
+HERE!!
+ROB :
+
+Starting to pop from store queue
+
+Start of cycle 13
+RESERVATION STATION :
+opcode	dest_t	src1	src1_t	src1_p	src2	src2_p	
+HERE!!
+ROB :
+
+
+Start of cycle 14
+RESERVATION STATION :
+opcode	dest_t	src1	src1_t	src1_p	src2	src2_p	
+HERE!!
+ROB :
+
+
+Start of cycle 15
+RESERVATION STATION :
+opcode	dest_t	src1	src1_t	src1_p	src2	src2_p	
+HERE!!
+ROB :
+
+
+Start of cycle 16
+RESERVATION STATION :
+opcode	dest_t	src1	src1_t	src1_p	src2	src2_p	
+HERE!!
+ROB :
+
+Poppping from store queue 
+
+all done

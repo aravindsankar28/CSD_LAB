@@ -1,0 +1,59 @@
+Tomasulo.cpp: In member function ‘void Tomasulo::fetch_instructions_to_buffer()’:
+Tomasulo.cpp:110:4: error: ‘debug’ was not declared in this scope
+ if(debug) DEBUG
+    ^
+Tomasulo.cpp:110:11: error: ‘DEBUG’ was not declared in this scope
+ if(debug) DEBUG
+           ^
+Tomasulo.cpp:111:7: error: expected ‘;’ before ‘cout’
+       cout << "Fetching instruction "<<instruction <<endl;
+       ^
+Tomasulo.cpp: In member function ‘void Tomasulo::decode_instructions()’:
+Tomasulo.cpp:130:4: error: ‘debug’ was not declared in this scope
+ if(debug) DEBUG
+    ^
+Tomasulo.cpp:130:11: error: ‘DEBUG’ was not declared in this scope
+ if(debug) DEBUG
+           ^
+Tomasulo.cpp:131:7: error: expected ‘;’ before ‘cout’
+       cout << "Decoding Instruction "<<instruction <<" "<<curr_instr <<endl;
+       ^
+Tomasulo.cpp:281:5: error: ‘debug’ was not declared in this scope
+  if(debug) DEBUG
+     ^
+Tomasulo.cpp:281:12: error: ‘DEBUG’ was not declared in this scope
+  if(debug) DEBUG
+            ^
+Tomasulo.cpp:282:2: error: expected ‘;’ before ‘cout’
+  cout <<"ERROR" <<endl;
+  ^
+Tomasulo.cpp: In member function ‘void Tomasulo::simulate()’:
+Tomasulo.cpp:300:4: error: ‘debug’ was not declared in this scope
+ if(debug) DEBUG
+    ^
+Tomasulo.cpp:300:11: error: ‘DEBUG’ was not declared in this scope
+ if(debug) DEBUG
+           ^
+Tomasulo.cpp:301:7: error: expected ‘;’ before ‘cout’
+       cout<<"Start of cycle "<<cycle+1<<endl;
+       ^
+Tomasulo.cpp:360:4: error: ‘debug’ was not declared in this scope
+ if(debug) DEBUG
+    ^
+Tomasulo.cpp:360:11: error: ‘DEBUG’ was not declared in this scope
+ if(debug) DEBUG
+           ^
+Tomasulo.cpp:361:5: error: expected ‘;’ before ‘cout’
+     cout << "All done" <<endl;
+     ^
+Tomasulo.cpp: In member function ‘void Tomasulo::execute_instructions()’:
+Tomasulo.cpp:424:4: error: ‘debug’ was not declared in this scope
+ if(debug) DEBUG
+    ^
+Tomasulo.cpp:424:11: error: ‘DEBUG’ was not declared in this scope
+ if(debug) DEBUG
+           ^
+Tomasulo.cpp:425:8: error: expected ‘;’ before ‘cout’
+        cout << "Scheduling Instruction " <<rs_entry->instruction_number<<" on ALU " << j <<" : ";
+        ^
+make: *** [Tomasulo.o] Error 1

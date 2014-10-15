@@ -1,0 +1,12 @@
+
+public class Bus {
+	String[] instructions;
+	boolean[] empty;
+	
+	public void addInstruction(int procID, String instr){
+		instructions[procID] = instr;
+		empty[procID] = false;
+	}
+	
+	
+}

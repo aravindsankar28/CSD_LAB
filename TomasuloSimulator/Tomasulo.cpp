@@ -2,11 +2,7 @@
   #include <fstream>
   #include <iostream>
   #include <string>
-  #define FILE_NAME "program.txt"
-  #define LATENCY_FILE_NAME "Latencies.txt"
-  #define REGISTER_FILE_NAME "Regster_File.txt"
-  #define MEMORY_FILE_NAME "Memory_File.txt"
-
+ 
   using namespace std;
   
   Tomasulo::Tomasulo(int num_arch_reg, int num_renamed_reg, int num_rs_entries, int issue_size, ROB* rob, Res_Station* rs, ARF* arf, RRF* rrf, bool debug)
@@ -28,24 +24,27 @@
     this->store_index = 0;
     this->curr_instr = 0;
     
-    this->initialize_memory();
-    this->initialize_instruction_cycles();
-    this->initialize_register_file();
-    
+    //Create NUM_INT_UNITS number of ALUs and 1 LSU with the same debug flag
     this->alu = (ALU *) malloc(NUM_INT_UNITS * sizeof(ALU));
     for (int i = 0; i < NUM_INT_UNITS; i++){
       this->alu[i] = *(new ALU(debug));
     }
     this->lsu = new LSU(Memory,8, debug);
     
+    //The data structure is now ready. Initialise RF, Memory and latencies.
+    this->initialize_memory();
+    this->initialize_instruction_cycles();
+    this->initialize_register_file();
+    
+    //Initialise the instruction_cycles array in ALU complex and LSU
     for (int i = 0; i < NUM_INT_UNITS; ++i)
     {
       this->alu[i].instruction_cycles = this->instruction_cycles;
     }
-    
     this->lsu->instruction_cycles = this->instruction_cycles;
     
   }
+  
   
   void Tomasulo::initialize_register_file()
   {
@@ -59,6 +58,8 @@
     }
     
   }
+  
+  
   void Tomasulo::initialize_memory()
   {
     std::ifstream input(MEMORY_FILE_NAME);
@@ -73,6 +74,8 @@
     }	
     
   }
+  
+  
   void Tomasulo::initialize_instruction_cycles()
   {
     std::ifstream input(LATENCY_FILE_NAME);
@@ -93,10 +96,12 @@
       this->instruction_cycles[opcode_code] = latency;
     }
   }
+  
+  
   void Tomasulo::fetch_instructions_to_cache()
   {
     
-    std::ifstream input(FILE_NAME);
+    std::ifstream input(PROGRAM_FILE_NAME);
     std::string line;
     
     while(std::getline(input,line))
@@ -104,37 +109,48 @@
     
   }
   
+  
   void Tomasulo::fetch_instructions_to_buffer()
   {
     int i = 0;
-    /* Make sure that instruction buffer has enough capacity b4 fetching to it. */
-    while(instruction_buffer->size() < max_instruction_buffer_size && i < issue_size && instruction_cache->size() > 0)
+    
+    while(instruction_buffer->size() < max_instruction_buffer_size 	//Ensure instruction_buffer is not full
+      && i < issue_size 						//Number of instructions to fetch
+      && instruction_cache->size() > 0)					//Ensure there are instructions still left to be executed
     {
+      //Pop from i-cache and push into instruction buffer
       string instruction = instruction_cache->front();
       instruction_cache->pop();
       instruction_buffer->push(instruction);
-if(this->debug)  
-      cout << "Fetching instruction "<<instruction <<endl;
- 
+      
+      //Print debug message if flag is set
+      if(this->debug)  
+	cout << "Fetching instruction "<<instruction <<endl;
       i++;
     }
   }
   
+  
   void Tomasulo::decode_instructions()
   {
     int i = 0;
-    /* Make sure that reservation station and rob have enough capacity b4 fetching to it. */
-    while(i < issue_size && instruction_buffer->size() > 0 && rs->size < rs->max_size && rob->get_size() < rob->max_size)
+
+    while(i < issue_size 			//Number of instructions to issue
+      && instruction_buffer->size() > 0 	//Ensure there is still an instruction to decode
+      && rs->size < rs->max_size 		//Ensure reservation station has enough space
+      && rob->get_size() < rob->max_size)	//Ensure ROB has enough space
     {
       
-      string instruction = instruction_buffer->front(); // fetch the first instruction from buffer.
+      string instruction = instruction_buffer->front(); 
       
       // Now actually decode to get opcode and operands
       Decoded_Instruction *decoded_instruction = new Decoded_Instruction(instruction);
       
+      //Increment IP
       curr_instr ++; // maintains instruction pointer
-if(this->debug)  
-      cout << "Decoding Instruction "<<instruction <<" "<<curr_instr <<endl;
+      
+      if(this->debug)  
+	cout << "Decoding Instruction "<<instruction <<" "<<curr_instr <<endl;
  
       operand dest,src1,src2;
       
@@ -169,25 +185,26 @@ if(this->debug)
 	  break;
 	
 	int dest_reg_rrf = found_dest_reg;
-	// doing destination allocate now. Not dest will always be a register
 	
+	// Doing destination allocate now.
+	// Note: dest will always be a register
 	ARF_Entry arf_entry_dest = *(arf->get_entry(dest.value)); 
-	arf_entry_dest.busy = 1; // set busy bit in arf
-	arf_entry_dest.tag = dest_reg_rrf; // set tag as the offset in rrf
-	RRF_Entry rrf_entry_dest = *(rrf->get_entry(dest_reg_rrf));
-	rrf_entry_dest.valid = 0; // set valid bit of rrf entry = 0 
-	rrf_entry_dest.busy = 1; // set busy bit of rrf entry = 1
+	arf_entry_dest.busy = 1; 					// set busy bit in arf
+	arf_entry_dest.tag = dest_reg_rrf;				// set tag as the offset in rrf
+	RRF_Entry rrf_entry_dest = *(rrf->get_entry(dest_reg_rrf));	// get rrf entry for dest
+	rrf_entry_dest.valid = 0; 					// set valid bit of rrf entry = 0 
+	rrf_entry_dest.busy = 1; 					// set busy bit of rrf entry = 1
 	
+	//set entries in ARF, RRF
 	rrf->entries[dest_reg_rrf] = rrf_entry_dest;
 	arf->entries[dest.value] = arf_entry_dest;
 	res_station_entry->dest_tag = found_dest_reg; // set destination tag
       }
+      
       // SOURCE READ FOR ALL INSTRUCTION TYPES
       // Now do src1 
       if ( ! src1.is_immediate )
       {
-	
-	
 	ARF_Entry arf_entry_src1 = *(arf->get_entry(src1.value));
 	if(! arf_entry_src1.busy)
 	{
@@ -234,13 +251,11 @@ if(this->debug)
 	}
 	else
 	{
-	  
 	  // Arf entry busy
 	  // Get corresponding rrf entry using the tag present in the arf entry.
 	  RRF_Entry rrf_entry_src2 = *(rrf->get_entry(arf_entry_src2.tag));
 	  if(! rrf_entry_src2.valid)
 	  {
-	    
 	    // if rrf entry is not valid, set tag for src1 in the res station entry.
 	    res_station_entry->src2_tag = arf_entry_src2.tag;
 	    res_station_entry->src2_data_present = 0;
@@ -261,7 +276,7 @@ if(this->debug)
 	res_station_entry->src2_data = src2.value;
       }
       
-      /* Setting entries of reservation station correctly */
+      /* Set entries of reservation station correctly */
       res_station_entry->opcode = decoded_instruction->opcode;
       res_station_entry->exec_over = 0;
       res_station_entry->busy = true;
@@ -283,23 +298,25 @@ if(this->debug)
       rob_entry->src1 = res_station_entry->src1_data;
       rob_entry->src2 = res_station_entry->src2_data;
       
+      //Attempt pushing into ROB.
+      //If it fails for some reason, inform user.
       if(! rob->attempt_push(*rob_entry)){
-	if(this->debug)  
-	cout <<"ERROR" <<endl;
+	if(this->debug)
+	  cout <<"ERROR pushing to ROB." <<endl;
  
       }
       
+      //Instruction has been decoded. Now, we can safely pop from the instruction buffer.
       instruction_buffer->pop();
       i++;
     }
   }
   
   
-  
-  
   void Tomasulo::simulate()
   {
     fetch_instructions_to_cache();
+    store_index = 0;
     while(rob->get_size()>0 || instruction_buffer->size() >0 || instruction_cache->size() >0 || lsu->store_queue.size() > 0)
     {
       if(this->debug) 
@@ -362,7 +379,7 @@ if(this->debug)
     }
     if(this->debug)
     {
-      cout << "All done" <<endl;
+      cout << "All instructions committed." <<endl;
     }
     //Report final results
     cout<<endl;
@@ -635,9 +652,5 @@ void Tomasulo::print_memory(int index)
     cout<<Memory[index];
 }
 
-  int get_cycles(int opcode)
-  {
-    return 1;
-  }
   
   
