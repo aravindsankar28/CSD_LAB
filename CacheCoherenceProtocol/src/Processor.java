@@ -7,7 +7,7 @@ import java.util.*;
  * @author Ganesh
  */
 public class Processor implements Runnable {
-	Bus bus;
+	InstrReg reg;
 	Cache cache;
 	int id;
 	private String generateInstruction(){
@@ -37,10 +37,10 @@ public class Processor implements Runnable {
 	}
 	@Override
 	public void run() {
-		while(bus.empty[id]){
-			String instr = generateInstruction();
-			if(bus.empty[this.id]){
-				bus.addInstruction(this.id, instr);
+		while(true){
+			if(reg.isEmpty()){
+				String instr = generateInstruction();
+				reg.write(instr);
 			}
 		}
 	}
