@@ -1,15 +1,28 @@
-/**
- * Processor Thread that generates a memory instruction as and when required
- */
+package cachecoherence;
+
 
 import java.util.*;
 /**
  * @author Ganesh
  */
 public class Processor implements Runnable {
-	InstrReg reg;
+	
+	Bus bus;
 	Cache cache;
 	int id;
+	int currInstrNum;
+	int totalInstr;
+	
+	volatile boolean running;
+	
+	public Processor(int id, Bus bus, int total){
+		this.bus = bus;
+		this.id = id;
+		cache = new Cache();
+		currInstrNum = 0;
+		totalInstr = total;
+	}
+	
 	private String generateInstruction(){
 		String instruction;
 		Random random = new Random();
@@ -26,23 +39,39 @@ public class Processor implements Runnable {
 			instruction += Integer.toString(memLocation) + " R1";
 		}
 		
-		if(Globals.debug){
-			System.out.println("TRACE : Generated Instruction \""+
+
+		Globals.printDebug("PROC  : Generated Instruction \""+
 								instruction +
 								"\" from Processor P"+
 								this.id);
-		}
 		
 		return instruction;
 	}
+	
+	public boolean isRunning(){
+		return running;
+	}
 	@Override
 	public void run() {
-		while(true){
-			if(reg.isEmpty()){
+		running = true;
+
+		Globals.printDebug("PROC  : Processor "	+
+							this.id		+
+							" started."	);
+
+		while(currInstrNum < totalInstr){
+			if(bus.instructions[this.id].isEmpty()){
 				String instr = generateInstruction();
-				reg.write(instr);
+				bus.instructions[this.id].write(instr);
+				currInstrNum ++;
 			}
 		}
+
+		running = false;
+	
+		Globals.printDebug("PROC  : Processor " + this.id + "done.");
+		
+		return;
 	}
 
 }

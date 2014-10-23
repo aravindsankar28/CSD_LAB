@@ -1,3 +1,5 @@
+package cachecoherence;
+
 /**
  * A direct-mapped private cache
  * @author ganesh

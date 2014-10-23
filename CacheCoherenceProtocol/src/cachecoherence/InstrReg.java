@@ -1,7 +1,9 @@
+package cachecoherence;
+
 
 public class InstrReg {
-	String value;
-	boolean empty;
+	volatile String value;
+	volatile boolean empty;
 	
 	InstrReg(){
 		value = "";

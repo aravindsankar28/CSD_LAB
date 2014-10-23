@@ -1,3 +1,5 @@
+package cachecoherence;
+
 
 public enum ProtocolState {
 	M,
