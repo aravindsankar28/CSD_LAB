@@ -58,6 +58,14 @@ public class Bus implements Runnable {
 		rspId = -1;
 	}
 	
+	boolean canChooseInstruction()
+	{
+		if(instructions[0].isEmpty() && instructions[1].isEmpty())
+		{
+			return false;
+		}
+		return true;
+	}
 	/**
 	 * Bus Arbitration Logic
 	 * @return A ScheduledInstruction containing instruction and processor id 
@@ -67,10 +75,11 @@ public class Bus implements Runnable {
 		String chosenInstr = "";
 		int chosenPid = -1;
 		
-		if(nestSize == 10){
+		/*if(nestSize == 10){
 			Globals.printDebug("BUS   : nestSize reached 10. Aborting...\n");
 			return null;
-		}
+		}*/
+		
 		if(instructions[0].isEmpty() && !instructions[1].isEmpty()){
 			chosenPid = 1;
 		}
@@ -78,6 +87,7 @@ public class Bus implements Runnable {
 			chosenPid = 0;
 		}
 		else if(!instructions[1].isEmpty() && !instructions[0].isEmpty()){
+			
 			Random r = new Random();
 			
 			float mult = 0;
@@ -111,9 +121,13 @@ public class Bus implements Runnable {
 			chosenInstr = instructions[chosenPid].value;		
 			return new ScheduledInstruction(chosenInstr, chosenPid);
 		}
+		else{
+			System.out.println("IMPOSSIBLE SHIT ");
+			return new ScheduledInstruction(chosenInstr, chosenPid);
+		}
 		
-		else
-			return chooseInstruction(nestSize + 1);
+		/*else
+			return chooseInstruction(nestSize + 1);*/
 	}
 	
 
@@ -136,12 +150,20 @@ public class Bus implements Runnable {
 		while(this.mustRun()){
 //			System.out.println("In while : Bus");
 			
-			ScheduledInstruction si = chooseInstruction(0);
+			
+			ScheduledInstruction si;
+			boolean flag = false;
+			do
+			{
+				flag = canChooseInstruction();
+			}while(! flag);
+			
+			si = chooseInstruction(0);
+			
 			String currInstr = si.getInstr();
 			rspId = si.getPid();
 			if(rspId >= 0)
 				instructions[rspId].flush();
-			
 			Globals.printDebug("BUS   : Processor "+ rspId +" chosen.");
 			synchronized(mem){
 				//TODO: Fill up here

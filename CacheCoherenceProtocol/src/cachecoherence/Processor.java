@@ -61,10 +61,12 @@ public class Processor implements Runnable {
 
 		while(currInstrNum < totalInstr){
 			if(bus.instructions[this.id].isEmpty()){
+				
 				String instr = generateInstruction();
 				bus.instructions[this.id].write(instr);
 				currInstrNum ++;
 			}
+			
 		}
 
 		running = false;
