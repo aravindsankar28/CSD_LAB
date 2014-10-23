@@ -38,9 +38,19 @@ public class Bus implements Runnable {
 	MemController mem;
 	int numProcs;
 	
+	boolean[] sharedLines;
 	
 	//ID of processor most recently served
 	int rspId;
+	
+	boolean finished_0,finished_1;
+	
+	
+	// Request details
+	String request_type;
+	int requesting_processor_id;
+	int requested_block;
+	
 	
 	/**
 	 * Constructor
@@ -56,6 +66,12 @@ public class Bus implements Runnable {
 			instructions[i] = new InstrReg();
 		}
 		rspId = -1;
+		finished_0 = true;
+		finished_1 = true;
+		sharedLines = new boolean[1024];
+		request_type = "";
+		requesting_processor_id = -1;
+		requested_block = -1;
 	}
 	
 	boolean canChooseInstruction()
@@ -130,6 +146,15 @@ public class Bus implements Runnable {
 			return chooseInstruction(nestSize + 1);*/
 	}
 	
+	public MemBlock readFromMemory(int block_number)
+	{
+		return mem.mem[block_number];
+	}
+	
+	public void writeToMemory(int block_number, MemBlock block)
+	{
+		mem.mem[block_number] = block;
+	}
 
 	public boolean mustRun(){
 		for (Processor p : procs){
@@ -148,9 +173,7 @@ public class Bus implements Runnable {
 		while(!mustRun());
 		
 		while(this.mustRun()){
-//			System.out.println("In while : Bus");
-			
-			
+	
 			ScheduledInstruction si;
 			boolean flag = false;
 			do

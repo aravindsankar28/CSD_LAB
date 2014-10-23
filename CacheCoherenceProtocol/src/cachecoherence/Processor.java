@@ -18,7 +18,8 @@ public class Processor implements Runnable {
 	public Processor(int id, Bus bus, int total){
 		this.bus = bus;
 		this.id = id;
-		cache = new Cache();
+		cache = new Cache(bus);
+		cache.id = id;
 		currInstrNum = 0;
 		totalInstr = total;
 	}
@@ -60,12 +61,21 @@ public class Processor implements Runnable {
 							" started."	);
 
 		while(currInstrNum < totalInstr){
-			if(bus.instructions[this.id].isEmpty()){
+			
+			String instr = generateInstruction();
+			
+			if(! cache.executeInstruction(instr))
+			{
 				
-				String instr = generateInstruction();
-				bus.instructions[this.id].write(instr);
-				currInstrNum ++;
+				while(! bus.instructions[this.id].isEmpty()); // busy wait		
+				if(bus.instructions[this.id].isEmpty()){
+					bus.instructions[this.id].write(instr);
+					currInstrNum ++;
+				}
+				
 			}
+			
+			
 			
 		}
 
