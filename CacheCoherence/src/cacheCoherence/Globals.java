@@ -8,4 +8,6 @@ public class Globals {
 		if(debug)
 			System.out.println("TRACE : " + str);
 	}
+	
+	public static int coherenceTrans;
 }

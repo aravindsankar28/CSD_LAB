@@ -146,8 +146,7 @@ public class CoherenceProtocol {
 	 *            : Id of processor issuing the instruction
 	 */
 	void executeMESIInstruction(DecodedInstruction instruction, int pid) {
-		// TODO: add code here for state transitions - Look at pid, instruction
-		// params and change state accordingly.
+
 		ProtocolState currProcState = getState(instruction);
 		int reqdBlock = instruction.blockNumber;
 		String instrType = instruction.type;
@@ -181,6 +180,9 @@ public class CoherenceProtocol {
 					if(getOtherState(instruction) != ProtocolState.S)
 						stateChanges[1-pid] ++;
 					
+					//TODO: increment coherence transaction here
+					Globals.coherenceTrans++;
+					
 					otherCache.stateArray[otherCache.getCacheLine(reqdBlock)] = ProtocolState.S;
 					
 				} else {
@@ -203,6 +205,9 @@ public class CoherenceProtocol {
 					otherCache.stateArray[otherCache.getCacheLine(reqdBlock)] = ProtocolState.I;
 					//TODO: added counter here - check
 					stateChanges[1-pid] ++;
+					
+					//TODO: increment coherence transaction here
+					Globals.coherenceTrans++;
 				}
 			}
 			break;
@@ -224,6 +229,8 @@ public class CoherenceProtocol {
 				
 				otherCache.stateArray[otherCache.getCacheLine(reqdBlock)] = ProtocolState.I;
 				
+				//TODO: increment coherence transaction here
+				Globals.coherenceTrans++;
 			}
 			break;
 
@@ -236,6 +243,7 @@ public class CoherenceProtocol {
 
 	public void simulateMESIProtocol() {
 		int cycle = 0;
+		Globals.coherenceTrans = 0;
 		boolean flag_0, flag_1;
 		boolean p0_has_executed_last_cycle = false, p1_has_executed_last_cycle = false;
 		Random r = new Random();
