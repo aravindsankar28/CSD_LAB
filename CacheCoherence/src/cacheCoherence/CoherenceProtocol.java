@@ -56,7 +56,8 @@ class DecodedInstruction {
 
 public class CoherenceProtocol {
 	Processor[] processors;
-
+	
+	int[] stateChanges;
 	/**
 	 * Constructors
 	 * 
@@ -65,6 +66,7 @@ public class CoherenceProtocol {
 	 */
 	public CoherenceProtocol(Processor[] processors) {
 		this.processors = processors;
+		stateChanges = new int[processors.length];
 	}
 
 	/**
@@ -160,6 +162,8 @@ public class CoherenceProtocol {
 				myCache.tagArray[myCache.getCacheLine(reqdBlock)] = reqdBlock
 						/ myCache.size;
 				myCache.stateArray[myCache.getCacheLine(reqdBlock)] = ProtocolState.M;
+				//TODO: added counter here - check
+				stateChanges[pid] ++; // change from E to M 
 			}
 
 			// nothing to do if it is a read
@@ -168,22 +172,37 @@ public class CoherenceProtocol {
 		case I:
 			if (instrType.equals("READ")) {
 				if (getOtherState(instruction) != ProtocolState.I) {
+					// This means block is shared - can be in M/E/S
 					myCache.tagArray[myCache.getCacheLine(reqdBlock)] = reqdBlock
 							/ myCache.size;
 					myCache.stateArray[myCache.getCacheLine(reqdBlock)] = ProtocolState.S;
+					
+					//TODO: added counter here - check
+					if(getOtherState(instruction) != ProtocolState.S)
+						stateChanges[1-pid] ++;
+					
 					otherCache.stateArray[otherCache.getCacheLine(reqdBlock)] = ProtocolState.S;
+					
 				} else {
 					myCache.tagArray[myCache.getCacheLine(reqdBlock)] = reqdBlock
 							/ myCache.size;
 					myCache.stateArray[myCache.getCacheLine(reqdBlock)] = ProtocolState.E;
 				}
+				//TODO: added counter here - check
+				stateChanges[pid] ++; // change from I to E/S 
 			}
 			if (instrType.equals("WRITE")) {
 				myCache.tagArray[myCache.getCacheLine(reqdBlock)] = reqdBlock
 						/ myCache.size;
 				myCache.stateArray[myCache.getCacheLine(reqdBlock)] = ProtocolState.M;
+				
+				//TODO: added counter here - check
+				stateChanges[pid] ++;
+				
 				if (getOtherState(instruction) != ProtocolState.I) {
 					otherCache.stateArray[otherCache.getCacheLine(reqdBlock)] = ProtocolState.I;
+					//TODO: added counter here - check
+					stateChanges[1-pid] ++;
 				}
 			}
 			break;
@@ -197,7 +216,14 @@ public class CoherenceProtocol {
 				myCache.tagArray[myCache.getCacheLine(reqdBlock)] = reqdBlock
 						/ myCache.size;
 				myCache.stateArray[myCache.getCacheLine(reqdBlock)] = ProtocolState.M;
+				
+				//TODO: added counter here - check
+				stateChanges[pid] ++;
+				if (getOtherState(instruction) != ProtocolState.I) 
+					stateChanges[1-pid] ++;
+				
 				otherCache.stateArray[otherCache.getCacheLine(reqdBlock)] = ProtocolState.I;
+				
 			}
 			break;
 
