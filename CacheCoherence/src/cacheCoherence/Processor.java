@@ -16,6 +16,11 @@ class Cache{
 		for(int i = 0; i < size; i++)
 			this.stateArray[i] = ProtocolState.I;
 	}
+	
+	public int getCacheLine(int block)
+	{
+		return block % size;
+	}
 }
 public class Processor {
 	Cache cache;
@@ -43,11 +48,11 @@ public class Processor {
 			instruction += Integer.toString(memLocation) + " R1";
 		}
 		
-/*
+
 		Globals.printDebug("Generated Instruction \""+
 								instruction +
 								"\" from Processor P"+
-								this.id);*/
+								this.id);
 
 		return instruction;
 		
