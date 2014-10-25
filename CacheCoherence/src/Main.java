@@ -16,7 +16,7 @@ public class Main {
 		
 		if (args.length == 1 && args[0].equals("--debug")){
 			System.out.println("Debug option enabled.");
-			Globals.debug = true;
+			//Globals.debug = true;
 		}
 		
 		Processor[] processors = new Processor[2];
@@ -26,7 +26,7 @@ public class Main {
 	
 		
 		CoherenceProtocol cp = new CoherenceProtocol(processors);
-		cp.simulateMESIProtocol();
+		cp.simulateMOESIProtocol();
 	}
 
 }

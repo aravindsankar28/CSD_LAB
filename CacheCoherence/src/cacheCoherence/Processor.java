@@ -34,26 +34,28 @@ public class Processor {
 	public String generateInstruction()
 	{
 		String instruction = "";
-		Random random = new Random();
 		
-		float toss = random.nextFloat();
+		
+		float toss = Globals.random.nextFloat();
 		if (toss < 0.5){
 			instruction = "LOAD R1 ";
-			int memLocation = Math.round(random.nextFloat() * 1024);
+			//int memLocation = Math.round(Globals.random.nextFloat() * 1024);
+			int memLocation = Globals.random.nextInt(1024);
 			instruction += Integer.toString(memLocation);
 		}
 		else{
 			instruction = "STORE ";
-			int memLocation = Math.round(random.nextFloat() * 1024);
+			//int memLocation = Math.round(Globals.random.nextFloat() * 1024);
+			int memLocation = Globals.random.nextInt(1024);
 			instruction += Integer.toString(memLocation) + " R1";
 		}
 		
-
+/*
 		Globals.printDebug("Generated Instruction \""+
 								instruction +
 								"\" from Processor P"+
 								this.id);
-
+*/
 		return instruction;
 		
 	}

@@ -58,6 +58,8 @@ public class CoherenceProtocol {
 	Processor[] processors;
 	
 	int[] stateChanges;
+
+	
 	/**
 	 * Constructors
 	 * 
@@ -67,6 +69,7 @@ public class CoherenceProtocol {
 	public CoherenceProtocol(Processor[] processors) {
 		this.processors = processors;
 		stateChanges = new int[processors.length];
+		
 	}
 
 	/**
@@ -88,7 +91,7 @@ public class CoherenceProtocol {
 		if (tag == cache.tagArray[cacheLine]) {
 			return cache.stateArray[cacheLine];
 		}
-
+		
 		// requested block not present. Return I state.
 		return ProtocolState.I;
 	}
@@ -157,19 +160,23 @@ public class CoherenceProtocol {
 
 		case E:
 			// if write, then invalidate other blocks
-			if (instrType.equals("WRITE")) {
+			
+			if (instrType.contentEquals("WRITE")) {
 				myCache.tagArray[myCache.getCacheLine(reqdBlock)] = reqdBlock
 						/ myCache.size;
 				myCache.stateArray[myCache.getCacheLine(reqdBlock)] = ProtocolState.M;
 				//TODO: added counter here - check
 				stateChanges[pid] ++; // change from E to M 
 			}
+			
 
 			// nothing to do if it is a read
 			break;
 
 		case I:
-			if (instrType.equals("READ")) {
+			
+			if (instrType.contentEquals("READ")) {
+				
 				if (getOtherState(instruction) != ProtocolState.I) {
 					// This means block is shared - can be in M/E/S
 					myCache.tagArray[myCache.getCacheLine(reqdBlock)] = reqdBlock
@@ -186,14 +193,16 @@ public class CoherenceProtocol {
 					otherCache.stateArray[otherCache.getCacheLine(reqdBlock)] = ProtocolState.S;
 					
 				} else {
+					
 					myCache.tagArray[myCache.getCacheLine(reqdBlock)] = reqdBlock
 							/ myCache.size;
 					myCache.stateArray[myCache.getCacheLine(reqdBlock)] = ProtocolState.E;
 				}
 				//TODO: added counter here - check
 				stateChanges[pid] ++; // change from I to E/S 
+				//System.out.println(stateChanges[0]+ " "+stateChanges[1]);
 			}
-			if (instrType.equals("WRITE")) {
+			if (instrType.contentEquals("WRITE")) {
 				myCache.tagArray[myCache.getCacheLine(reqdBlock)] = reqdBlock
 						/ myCache.size;
 				myCache.stateArray[myCache.getCacheLine(reqdBlock)] = ProtocolState.M;
@@ -210,6 +219,7 @@ public class CoherenceProtocol {
 					Globals.coherenceTrans++;
 				}
 			}
+			
 			break;
 
 		case M:
@@ -217,7 +227,8 @@ public class CoherenceProtocol {
 			break;
 
 		case S:
-			if (instrType.equalsIgnoreCase("WRITE")) {
+			
+			if (instrType.contentEquals("WRITE")) {
 				myCache.tagArray[myCache.getCacheLine(reqdBlock)] = reqdBlock
 						/ myCache.size;
 				myCache.stateArray[myCache.getCacheLine(reqdBlock)] = ProtocolState.M;
@@ -238,11 +249,12 @@ public class CoherenceProtocol {
 			break;
 
 		}
+		Globals.printDebug("Processor "+pid+" block - no "+instruction.blockNumber+" cache line_no - "+(instruction.blockNumber%32)+" tag "+(instruction.blockNumber/32)+" "+myCache.stateArray[myCache.getCacheLine(reqdBlock)]);
 
 	}
 
 	public void simulateMESIProtocol() {
-		int cycle = 0;
+		int cycle = 0,total  = 0;
 		Globals.coherenceTrans = 0;
 		boolean flag_0, flag_1;
 		boolean p0_has_executed_last_cycle = false, p1_has_executed_last_cycle = false;
@@ -251,23 +263,22 @@ public class CoherenceProtocol {
 				processors[0].generateInstruction(), 0);
 		DecodedInstruction instruction_p1 = new DecodedInstruction(
 				processors[1].generateInstruction(), 1);
-		while (cycle < 10) {
+		while (cycle < 100000) {
 
-			if (p0_has_executed_last_cycle)
-				instruction_p0 = new DecodedInstruction(
-						processors[0].generateInstruction(), 0);
+			//if (p0_has_executed_last_cycle)
+				
 
-			if (p1_has_executed_last_cycle)
-				instruction_p1 = new DecodedInstruction(
-						processors[1].generateInstruction(), 1);
+			//if (p1_has_executed_last_cycle)
+				
 
 			p0_has_executed_last_cycle = false;
 			p1_has_executed_last_cycle = false;
 
 			flag_0 = needToAccessBus(instruction_p0);
 			flag_1 = needToAccessBus(instruction_p1);
-
+/*
 			if (!flag_0) {
+				total ++;
 				executeMESIInstruction(instruction_p0, 0);
 				p0_has_executed_last_cycle = true;
 				Globals.printDebug("Executing instruction "
@@ -275,36 +286,47 @@ public class CoherenceProtocol {
 						+ instruction_p0.blockNumber + " on processor 0");
 			}
 			if (!flag_1) {
+				total ++;
 				executeMESIInstruction(instruction_p1, 1);
 				p0_has_executed_last_cycle = true;
-
+				
 				Globals.printDebug("Executing instruction "
 						+ instruction_p1.type + " "
 						+ instruction_p1.blockNumber + " on processor 1");
-			}
+			}*/
 
-			if (flag_0 && flag_1) {
+			//if (flag_0 && flag_1) {
+			if(true){
+				total ++;
 				// only one is allowed.
 				// the rejected guy will appear in the next cycle.
 				float prob = r.nextFloat();
 
 				if (prob < 0.5) {
-					executeMESIInstruction(instruction_p0, 0);
+					instruction_p0 = new DecodedInstruction(
+							processors[0].generateInstruction(), 0);
+					
 					p0_has_executed_last_cycle = true;
 					Globals.printDebug("Executing instruction "
 							+ instruction_p0.type + " "
 							+ instruction_p0.blockNumber + " on processor 0");
+					executeMESIInstruction(instruction_p0, 0);
 				} else {
-					executeMESIInstruction(instruction_p1, 1);
+					instruction_p1 = new DecodedInstruction(
+							processors[1].generateInstruction(), 1);
 					p1_has_executed_last_cycle = true;
 					Globals.printDebug("Executing instruction "
 							+ instruction_p1.type + " "
 							+ instruction_p1.blockNumber + " on processor 1");
+					executeMESIInstruction(instruction_p1, 1);
 				}
 
 			}
 			cycle++;
 		}
+		
+		
+		System.out.println((stateChanges[0]+stateChanges[1])/(float)(total));
 	}
 
 	/**
@@ -328,17 +350,19 @@ public class CoherenceProtocol {
 
 		case E:
 			// if write, then invalidate other blocks
-			if (instrType.equals("WRITE")) {
+			if (instrType.contentEquals("WRITE")) {
 				myCache.tagArray[myCache.getCacheLine(reqdBlock)] = reqdBlock
 						/ myCache.size;
 				myCache.stateArray[myCache.getCacheLine(reqdBlock)] = ProtocolState.M;
+				//TODO: check
+				stateChanges[pid] ++;
 			}
 
 			// nothing to do if it is a read
 			break;
 
 		case I:
-			if (instrType.equals("READ")) {
+			if (instrType.contentEquals("READ")) {
 				if (getOtherState(instruction) != ProtocolState.I) {
 					myCache.tagArray[myCache.getCacheLine(reqdBlock)] = reqdBlock
 							/ myCache.size;
@@ -346,10 +370,16 @@ public class CoherenceProtocol {
 					
 					// Added transition to O here
 					if(getOtherState(instruction) == ProtocolState.M)
-						otherCache.stateArray[otherCache.getCacheLine(reqdBlock)] = ProtocolState.O;
+						{
+							otherCache.stateArray[otherCache.getCacheLine(reqdBlock)] = ProtocolState.O;
+							stateChanges[1-pid] ++;
+						}
 					else if(getOtherState(instruction) != ProtocolState.O)
 						// if in O state, remain in O on bus read
-						otherCache.stateArray[otherCache.getCacheLine(reqdBlock)] = ProtocolState.S;
+						{
+							stateChanges[1-pid] ++;
+							otherCache.stateArray[otherCache.getCacheLine(reqdBlock)] = ProtocolState.S;
+						}
 					
 				} else {
 					myCache.tagArray[myCache.getCacheLine(reqdBlock)] = reqdBlock
@@ -357,37 +387,46 @@ public class CoherenceProtocol {
 					myCache.stateArray[myCache.getCacheLine(reqdBlock)] = ProtocolState.E;
 				}
 			}
-			if (instrType.equals("WRITE")) {
+			if (instrType.contentEquals("WRITE")) {
 				myCache.tagArray[myCache.getCacheLine(reqdBlock)] = reqdBlock
 						/ myCache.size;
 				myCache.stateArray[myCache.getCacheLine(reqdBlock)] = ProtocolState.M;
 				if (getOtherState(instruction) != ProtocolState.I) {
+					stateChanges[1-pid] ++;
 					otherCache.stateArray[otherCache.getCacheLine(reqdBlock)] = ProtocolState.I;
 				}
 			}
+			stateChanges[pid] ++;
 			break;
 
 		case M:
 			// Nothing to do if block is in Modified state
 			break;
 		case O:
-			if (instrType.equals("WRITE")) {
+			if (instrType.contentEquals("WRITE")) {
 				myCache.tagArray[myCache.getCacheLine(reqdBlock)] = reqdBlock
 						/ myCache.size;
 				myCache.stateArray[myCache.getCacheLine(reqdBlock)] = ProtocolState.M;
+				stateChanges[pid] ++;
 				//TODO: check
 				if (getOtherState(instruction) == ProtocolState.S)
 				{
+					stateChanges[1-pid] ++;
 					otherCache.stateArray[otherCache.getCacheLine(reqdBlock)] = ProtocolState.I;
 				}
 			}
 			break;
 		case S:
-			if (instrType.equalsIgnoreCase("WRITE")) {
+			if (instrType.contentEquals("WRITE")) {
 				myCache.tagArray[myCache.getCacheLine(reqdBlock)] = reqdBlock
 						/ myCache.size;
 				myCache.stateArray[myCache.getCacheLine(reqdBlock)] = ProtocolState.M;
-				otherCache.stateArray[otherCache.getCacheLine(reqdBlock)] = ProtocolState.I;
+				stateChanges[pid] ++;
+				if(getOtherState(instruction) != ProtocolState.I)
+					{
+						otherCache.stateArray[otherCache.getCacheLine(reqdBlock)] = ProtocolState.I;
+						stateChanges[1-pid] ++;
+					}
 			}
 			break;
 
@@ -407,15 +446,14 @@ public class CoherenceProtocol {
 				processors[0].generateInstruction(), 0);
 		DecodedInstruction instruction_p1 = new DecodedInstruction(
 				processors[1].generateInstruction(), 1);
-		while (cycle < 10) {
+		int total = 0;
+		while (cycle < 100000) {
 
-			if (p0_has_executed_last_cycle)
-				instruction_p0 = new DecodedInstruction(
-						processors[0].generateInstruction(), 0);
+			//if (p0_has_executed_last_cycle)
+				
 
-			if (p1_has_executed_last_cycle)
-				instruction_p1 = new DecodedInstruction(
-						processors[1].generateInstruction(), 1);
+			//if (p1_has_executed_last_cycle)
+				
 
 			p0_has_executed_last_cycle = false;
 			p1_has_executed_last_cycle = false;
@@ -423,8 +461,9 @@ public class CoherenceProtocol {
 			flag_0 = needToAccessBus(instruction_p0);
 			flag_1 = needToAccessBus(instruction_p1);
 
-			if (!flag_0) {
-				executeMESIInstruction(instruction_p0, 0);
+/*			if (!flag_0) {
+				executeMOESIInstruction(instruction_p0, 0);
+				total ++;
 				p0_has_executed_last_cycle = true;
 				Globals.printDebug("Executing instruction "
 						+ instruction_p0.type + " "
@@ -432,26 +471,31 @@ public class CoherenceProtocol {
 			}
 			if (!flag_1) {
 				executeMOESIInstruction(instruction_p1, 1);
+				total ++;
 				p0_has_executed_last_cycle = true;
-
+				
 				Globals.printDebug("Executing instruction "
 						+ instruction_p1.type + " "
 						+ instruction_p1.blockNumber + " on processor 1");
-			}
+			}*/
 
-			if (flag_0 && flag_1) {
+			if (true) {
 				// only one is allowed.
 				// the rejected guy will appear in the next cycle.
 				float prob = r.nextFloat();
-
+				total ++;
 				if (prob < 0.5) {
-					executeMESIInstruction(instruction_p0, 0);
+					instruction_p0 = new DecodedInstruction(
+							processors[0].generateInstruction(), 0);
+					executeMOESIInstruction(instruction_p0, 0);
 					p0_has_executed_last_cycle = true;
 					Globals.printDebug("Executing instruction "
 							+ instruction_p0.type + " "
 							+ instruction_p0.blockNumber + " on processor 0");
 				} else {
-					executeMESIInstruction(instruction_p1, 1);
+					instruction_p1 = new DecodedInstruction(
+							processors[1].generateInstruction(), 1);
+					executeMOESIInstruction(instruction_p1, 1);
 					p1_has_executed_last_cycle = true;
 					Globals.printDebug("Executing instruction "
 							+ instruction_p1.type + " "
@@ -461,6 +505,8 @@ public class CoherenceProtocol {
 			}
 			cycle++;
 		}
+		
+		System.out.println((stateChanges[0]+stateChanges[1])/(float)(total));
 	}
 
 }
