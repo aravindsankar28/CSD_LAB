@@ -158,6 +158,7 @@ public class CoherenceProtocol {
 			break;
 		
 		case I:
+			if(instrType.equals ("READ")){
 			if(getOtherState(instruction) != ProtocolState.I){
 				myCache.tagArray[myCache.getCacheLine(reqdBlock)] = reqdBlock/myCache.size;
 				myCache.stateArray[myCache.getCacheLine(reqdBlock)] = ProtocolState.S;
@@ -166,6 +167,14 @@ public class CoherenceProtocol {
 			else{
 				myCache.tagArray[myCache.getCacheLine(reqdBlock)] = reqdBlock/myCache.size;
 				myCache.stateArray[myCache.getCacheLine(reqdBlock)] = ProtocolState.E;
+			}
+			}
+			if(instrType.equals("WRITE")){
+				myCache.tagArray[myCache.getCacheLine(reqdBlock)] = reqdBlock/myCache.size;
+				myCache.stateArray[myCache.getCacheLine(reqdBlock)] = ProtocolState.M;
+				if(getOtherState(instruction) != ProtocolState.I){
+					otherCache.stateArray[otherCache.getCacheLine(reqdBlock)] = ProtocolState.I;
+				}
 			}
 			break;
 		
