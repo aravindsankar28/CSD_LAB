@@ -183,7 +183,7 @@ public class CoherenceProtocol {
 			break;
 		
 		case S:
-			if (instrType == "WRITE"){
+			if (instrType.equalsIgnoreCase("WRITE")){
 				myCache.tagArray[myCache.getCacheLine(reqdBlock)] = reqdBlock/myCache.size;
 				myCache.stateArray[myCache.getCacheLine(reqdBlock)] = ProtocolState.M;
 				otherCache.stateArray[otherCache.getCacheLine(reqdBlock)] = ProtocolState.I;
