@@ -183,14 +183,13 @@ public class CoherenceProtocol {
 							/ myCache.size;
 					myCache.stateArray[myCache.getCacheLine(reqdBlock)] = ProtocolState.S;
 					
-					//TODO: added counter here - check
+					otherCache.stateArray[otherCache.getCacheLine(reqdBlock)] = ProtocolState.S;
+
 					if(getOtherState(instruction) != ProtocolState.S)
 						stateChanges[1-pid] ++;
 					
-					//TODO: increment coherence transaction here
 					Globals.coherenceTrans++;
-					
-					otherCache.stateArray[otherCache.getCacheLine(reqdBlock)] = ProtocolState.S;
+					Globals.sharedLineRead++;
 					
 				} else {
 					
@@ -198,25 +197,24 @@ public class CoherenceProtocol {
 							/ myCache.size;
 					myCache.stateArray[myCache.getCacheLine(reqdBlock)] = ProtocolState.E;
 				}
-				//TODO: added counter here - check
+				
 				stateChanges[pid] ++; // change from I to E/S 
-				//System.out.println(stateChanges[0]+ " "+stateChanges[1]);
+				
 			}
 			if (instrType.contentEquals("WRITE")) {
 				myCache.tagArray[myCache.getCacheLine(reqdBlock)] = reqdBlock
 						/ myCache.size;
 				myCache.stateArray[myCache.getCacheLine(reqdBlock)] = ProtocolState.M;
 				
-				//TODO: added counter here - check
 				stateChanges[pid] ++;
+				
+				Globals.busRdEx++;
+				Globals.coherenceTrans++;
 				
 				if (getOtherState(instruction) != ProtocolState.I) {
 					otherCache.stateArray[otherCache.getCacheLine(reqdBlock)] = ProtocolState.I;
 					//TODO: added counter here - check
-					stateChanges[1-pid] ++;
-					
-					//TODO: increment coherence transaction here
-					Globals.coherenceTrans++;
+					stateChanges[1-pid] ++;					
 				}
 			}
 			
@@ -233,15 +231,16 @@ public class CoherenceProtocol {
 						/ myCache.size;
 				myCache.stateArray[myCache.getCacheLine(reqdBlock)] = ProtocolState.M;
 				
-				//TODO: added counter here - check
 				stateChanges[pid] ++;
+				
+				Globals.busRdEx++;
+				Globals.coherenceTrans++;
+				
 				if (getOtherState(instruction) != ProtocolState.I) 
 					stateChanges[1-pid] ++;
 				
 				otherCache.stateArray[otherCache.getCacheLine(reqdBlock)] = ProtocolState.I;
 				
-				//TODO: increment coherence transaction here
-				Globals.coherenceTrans++;
 			}
 			break;
 
@@ -255,7 +254,12 @@ public class CoherenceProtocol {
 
 	public void simulateMESIProtocol() {
 		int cycle = 0,total  = 0;
+		
 		Globals.coherenceTrans = 0;
+		Globals.busRd = 0;
+		Globals.busRdEx = 0;
+		Globals.sharedLineRead = 0;
+		
 		boolean flag_0, flag_1;
 		boolean p0_has_executed_last_cycle = false, p1_has_executed_last_cycle = false;
 		Random r = new Random();
@@ -327,10 +331,12 @@ public class CoherenceProtocol {
 		
 		
 		System.out.println((stateChanges[0]+stateChanges[1])/(float)(total));
+		System.out.println("Coherence transactions : " + Globals.coherenceTrans);
+
 	}
 
 	/**
-	 * Execute an instruction, assuming MESI protocol
+	 * Execute an instruction, assuming MOESI protocol
 	 * 
 	 * @param instruction
 	 *            : Decoded instruction object
@@ -368,6 +374,10 @@ public class CoherenceProtocol {
 							/ myCache.size;
 					myCache.stateArray[myCache.getCacheLine(reqdBlock)] = ProtocolState.S;
 					
+					Globals.sharedLineRead++;
+					Globals.busRd++;
+					Globals.coherenceTrans += 2;
+					
 					// Added transition to O here
 					if(getOtherState(instruction) == ProtocolState.M)
 						{
@@ -395,6 +405,9 @@ public class CoherenceProtocol {
 					stateChanges[1-pid] ++;
 					otherCache.stateArray[otherCache.getCacheLine(reqdBlock)] = ProtocolState.I;
 				}
+				
+				Globals.busRdEx++;
+				Globals.coherenceTrans++;
 			}
 			stateChanges[pid] ++;
 			break;
@@ -408,7 +421,10 @@ public class CoherenceProtocol {
 						/ myCache.size;
 				myCache.stateArray[myCache.getCacheLine(reqdBlock)] = ProtocolState.M;
 				stateChanges[pid] ++;
-				//TODO: check
+				
+				Globals.busRdEx++;
+				Globals.coherenceTrans++;
+				
 				if (getOtherState(instruction) == ProtocolState.S)
 				{
 					stateChanges[1-pid] ++;
@@ -421,6 +437,10 @@ public class CoherenceProtocol {
 				myCache.tagArray[myCache.getCacheLine(reqdBlock)] = reqdBlock
 						/ myCache.size;
 				myCache.stateArray[myCache.getCacheLine(reqdBlock)] = ProtocolState.M;
+				
+				Globals.busRdEx++;
+				Globals.coherenceTrans++;
+				
 				stateChanges[pid] ++;
 				if(getOtherState(instruction) != ProtocolState.I)
 					{
@@ -438,6 +458,12 @@ public class CoherenceProtocol {
 	}
 
 	public void simulateMOESIProtocol() {
+		
+		Globals.coherenceTrans = 0;
+		Globals.busRd = 0;
+		Globals.busRdEx = 0;
+		Globals.sharedLineRead = 0;
+		
 		int cycle = 0;
 		boolean flag_0, flag_1;
 		boolean p0_has_executed_last_cycle = false, p1_has_executed_last_cycle = false;
@@ -507,6 +533,7 @@ public class CoherenceProtocol {
 		}
 		
 		System.out.println((stateChanges[0]+stateChanges[1])/(float)(total));
+		System.out.println("Coherence transactions : " + Globals.coherenceTrans);
 	}
 
 }

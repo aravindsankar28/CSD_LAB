@@ -26,6 +26,9 @@ public class Main {
 	
 		
 		CoherenceProtocol cp = new CoherenceProtocol(processors);
+		
+		cp.simulateMESIProtocol();
+		
 		cp.simulateMOESIProtocol();
 	}
 

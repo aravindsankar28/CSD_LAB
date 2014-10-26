@@ -13,4 +13,10 @@ public class Globals {
 	}
 	
 	public static int coherenceTrans;
+	
+	public static int busRd;
+	
+	public static int busRdEx;
+	
+	public static int sharedLineRead;
 }
